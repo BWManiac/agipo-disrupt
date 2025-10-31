@@ -4,6 +4,29 @@ import "@xyflow/react/dist/style.css";
 import { WebContainer } from "@webcontainer/api";
 
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+
+import {
   ReactFlow,
   useNodesState,
   useEdgesState,
@@ -16,32 +39,46 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 function CodeNode({ data }) {
-  const onChange = useCallback((evt) => {
-    data.onChange(data.id, evt.target.value);
-  }, []);
+  const onChange = useCallback(
+    (evt) => {
+      data.onChange(data.id, evt.target.value);
+    },
+    [data.id, data.onChange]
+  );
 
   return (
-    <div
+    <Card
       style={{
-        border: `1px solid ${data.isRunning ? "green" : "#777"}`,
-        padding: 10,
-        background: "white",
+        width: 350,
+        borderWidth: data.isRunning ? "2px" : "1px",
+        borderColor: data.isRunning ? "hsl(var(--primary))" : undefined,
       }}
     >
       <Handle type="target" position={Position.Top} />
-      <div>
-        <label htmlFor="text">Code:</label>
-        <textarea
-          id="text"
-          name="text"
-          onChange={onChange}
-          className="nodrag"
-          defaultValue={data.code}
-          style={{ width: "100%", height: 100 }}
-        />
-      </div>
+      <CardHeader>
+        <CardTitle>Node {data.id}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid w-full gap-1.5">
+          <Label htmlFor={`code-${data.id}`}>Code</Label>
+          <ResizablePanelGroup
+            direction="vertical"
+            className="min-h-[200px] w-full rounded-lg border"
+          >
+            <ResizablePanel defaultSize={100}>
+              <Textarea
+                id={`code-${data.id}`}
+                defaultValue={data.code}
+                onChange={onChange}
+                className="h-full w-full resize-none"
+              />
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+          </ResizablePanelGroup>
+        </div>
+      </CardContent>
       <Handle type="source" position={Position.Bottom} />
-    </div>
+    </Card>
   );
 }
 
@@ -272,41 +309,30 @@ export default function WebcontainerTestPage() {
   return (
     <div style={{ height: "100vh", width: "100vw", display: "flex" }}>
       <div style={{ flexGrow: 1, position: "relative" }}>
-        <div
-          style={{
-            position: "absolute",
-            zIndex: 10,
-            top: 10,
-            left: 10,
-            background: "rgba(255,255,255,0.9)",
-            padding: 10,
-            borderRadius: 5,
-            display: "flex",
-            gap: 10,
-            alignItems: "center",
-          }}
-        >
-          <button onClick={onAdd} disabled={isBooting || isInstalling}>
+        <div className="absolute z-10 top-4 left-4 bg-background/90 p-4 rounded-lg shadow-lg flex gap-4 items-center">
+          <Button onClick={onAdd} disabled={isBooting || isInstalling}>
             Add Node
-          </button>
-          <button onClick={onRun} disabled={isBooting || isInstalling}>
+          </Button>
+          <Button onClick={onRun} disabled={isBooting || isInstalling}>
             {isBooting ? "Booting..." : "Run"}
-          </button>
-          <div style={{ borderLeft: "1px solid #ccc", height: 20 }} />
-          <input
-            type="text"
-            placeholder="npm package"
-            value={packageName}
-            onChange={(e) => setPackageName(e.target.value)}
-            disabled={isBooting || isInstalling}
-            style={{ padding: "2px 5px" }}
-          />
-          <button
-            onClick={onInstall}
-            disabled={isBooting || isInstalling || !packageName}
-          >
-            {isInstalling ? "Installing..." : "Install"}
-          </button>
+          </Button>
+          <Separator orientation="vertical" className="h-6" />
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              placeholder="npm package"
+              value={packageName}
+              onChange={(e) => setPackageName(e.target.value)}
+              disabled={isBooting || isInstalling}
+              className="w-40"
+            />
+            <Button
+              onClick={onInstall}
+              disabled={isBooting || isInstalling || !packageName}
+            >
+              {isInstalling ? "Installing..." : "Install"}
+            </Button>
+          </div>
         </div>
         <ReactFlow
           nodes={augmentedNodes}
@@ -320,71 +346,31 @@ export default function WebcontainerTestPage() {
           <Background />
         </ReactFlow>
       </div>
-      <div
-        style={{
-          width: "300px",
-          padding: "10px",
-          borderLeft: "1px solid #ccc",
-          fontFamily: "monospace",
-          backgroundColor: "#f7f7f7",
-          overflow: "auto",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <div style={{ display: "flex", borderBottom: "1px solid #ccc" }}>
-          <button
-            onClick={() => setActiveTab("state")}
-            style={{
-              padding: "10px",
-              border: "none",
-              background: activeTab === "state" ? "#eee" : "transparent",
-              cursor: "pointer",
-              borderRight: "1px solid #ccc",
-            }}
+      <div className="w-[400px] border-l bg-background">
+        <Tabs defaultValue="console" className="h-full flex flex-col">
+          <TabsList className="m-2">
+            <TabsTrigger value="console">Console</TabsTrigger>
+            <TabsTrigger value="state">State</TabsTrigger>
+          </TabsList>
+          <TabsContent
+            value="console"
+            className="flex-grow overflow-auto p-4"
           >
-            State
-          </button>
-          <button
-            onClick={() => setActiveTab("console")}
-            style={{
-              padding: "10px",
-              border: "none",
-              background: activeTab === "console" ? "#eee" : "transparent",
-              cursor: "pointer",
-            }}
+            <h3 className="font-semibold mb-2">Output</h3>
+            <pre className="bg-black text-white p-4 rounded-md text-sm whitespace-pre-wrap break-all h-full">
+              {output}
+            </pre>
+          </TabsContent>
+          <TabsContent
+            value="state"
+            className="flex-grow overflow-auto p-4 text-sm"
           >
-            Console
-          </button>
-        </div>
-
-        <div style={{ flexGrow: 1, overflow: "auto", padding: "10px" }}>
-          {activeTab === "state" && (
-            <div>
-              <h3>Nodes</h3>
-              <pre>{JSON.stringify(nodes, null, 2)}</pre>
-              <h3>Edges</h3>
-              <pre>{JSON.stringify(edges, null, 2)}</pre>
-            </div>
-          )}
-
-          {activeTab === "console" && (
-            <div>
-              <h3>Output</h3>
-              <pre
-                style={{
-                  background: "black",
-                  color: "white",
-                  padding: 10,
-                  whiteSpace: "pre-wrap",
-                  wordBreak: "break-all",
-                }}
-              >
-                {output}
-              </pre>
-            </div>
-          )}
-        </div>
+            <h3 className="font-semibold mb-2">Nodes</h3>
+            <pre>{JSON.stringify(nodes, null, 2)}</pre>
+            <h3 className="font-semibold mt-4 mb-2">Edges</h3>
+            <pre>{JSON.stringify(edges, null, 2)}</pre>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
