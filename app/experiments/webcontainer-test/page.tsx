@@ -52,13 +52,8 @@ const initialNodes = [
     position: { x: 0, y: 0 },
     data: {
       id: "1",
-      code: `const cowsay = require('cowsay');
-
-console.log(cowsay.say({
-    text : "I'm a mooo-dule",
-    e : "oO",
-    T : "U "
-}));`,
+      code: `// This node simply outputs a string to be used by the next node.
+process.stdout.write("Data flows like a river!");`,
       isRunning: false,
     },
   },
@@ -68,20 +63,33 @@ console.log(cowsay.say({
     position: { x: 300, y: 0 },
     data: {
       id: "2",
-      code: `const readline = require('readline');
+      code: `const cowsay = require('cowsay');
+const readline = require('readline');
+
+// This script reads a single line from standard input...
 const rl = readline.createInterface({ input: process.stdin });
-rl.on('line', (line) => console.log(line + " World"));`,
+
+rl.on('line', (line) => {
+  // ...and uses that line as the text for the cow.
+  console.log(cowsay.say({
+      text : line,
+      e : "oO",
+      T : "U "
+  }));
+});`,
       isRunning: false,
     },
   },
 ];
+
+const initialEdges = [{ id: "e1-2", source: "1", target: "2" }];
 
 let id = 3;
 const getNewId = () => `${id++}`;
 
 export default function WebcontainerTestPage() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const webcontainerInstance = useRef(null);
   const [isBooting, setIsBooting] = useState(true);
   const [output, setOutput] = useState("");
