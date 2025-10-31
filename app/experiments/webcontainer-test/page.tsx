@@ -50,7 +50,17 @@ const initialNodes = [
     id: "1",
     type: "code",
     position: { x: 0, y: 0 },
-    data: { id: "1", code: 'console.log("Hello");', isRunning: false },
+    data: {
+      id: "1",
+      code: `const cowsay = require('cowsay');
+
+console.log(cowsay.say({
+    text : "I'm a mooo-dule",
+    e : "oO",
+    T : "U "
+}));`,
+      isRunning: false,
+    },
   },
   {
     id: "2",
@@ -75,6 +85,8 @@ export default function WebcontainerTestPage() {
   const webcontainerInstance = useRef(null);
   const [isBooting, setIsBooting] = useState(true);
   const [output, setOutput] = useState("");
+  const [packageName, setPackageName] = useState("cowsay");
+  const [isInstalling, setIsInstalling] = useState(false);
 
   const nodeTypes = useMemo(() => ({ code: CodeNode }), []);
 
@@ -119,6 +131,30 @@ export default function WebcontainerTestPage() {
     };
     setNodes((nds) => nds.concat(newNode));
   }, [setNodes]);
+
+  const onInstall = useCallback(async () => {
+    if (!webcontainerInstance.current || !packageName) return;
+
+    setIsInstalling(true);
+    setOutput(`Installing ${packageName}...\n`);
+
+    const command = `cd /tmp && npm install ${packageName}`;
+    const process = await webcontainerInstance.current.spawn("sh", [
+      "-c",
+      command,
+    ]);
+
+    process.output.pipeTo(
+      new WritableStream({
+        write(data) {
+          setOutput((prev) => prev + data);
+        },
+      })
+    );
+
+    await process.exit;
+    setIsInstalling(false);
+  }, [packageName]);
 
   const onRun = useCallback(async () => {
     if (!webcontainerInstance.current) return;
@@ -173,7 +209,7 @@ export default function WebcontainerTestPage() {
         .map((node) => `node /tmp/node-${node.id}.js`)
         .join(" | ");
 
-      const fullCommand = `${writeCommands} && ${executeCommands}`;
+      const fullCommand = `cd /tmp && ${writeCommands} && ${executeCommands}`;
 
       const process = await webcontainerInstance.current.spawn("sh", [
         "-c",
@@ -227,24 +263,42 @@ export default function WebcontainerTestPage() {
   return (
     <div style={{ height: "100vh", width: "100vw", display: "flex" }}>
       <div style={{ flexGrow: 1, position: "relative" }}>
-        <button
-          onClick={onAdd}
-          style={{ position: "absolute", zIndex: 10, left: 10, top: 10 }}
+        <div
+          style={{
+            position: "absolute",
+            zIndex: 10,
+            top: 10,
+            left: 10,
+            background: "rgba(255,255,255,0.9)",
+            padding: 10,
+            borderRadius: 5,
+            display: "flex",
+            gap: 10,
+            alignItems: "center",
+          }}
         >
-          Add Node
-        </button>
-        <button
-          onClick={onRun}
-          disabled={isBooting}
-          style={{ position: "absolute", zIndex: 10, left: 10, top: 40 }}
-        >
-          {isBooting ? "Booting..." : "Run"}
-        </button>
-        {isBooting && (
-          <div style={{ position: "absolute", zIndex: 10, left: 10, top: 40, color: 'white' }}>
-            Booting WebContainer...
-          </div>
-        )}
+          <button onClick={onAdd} disabled={isBooting || isInstalling}>
+            Add Node
+          </button>
+          <button onClick={onRun} disabled={isBooting || isInstalling}>
+            {isBooting ? "Booting..." : "Run"}
+          </button>
+          <div style={{ borderLeft: "1px solid #ccc", height: 20 }} />
+          <input
+            type="text"
+            placeholder="npm package"
+            value={packageName}
+            onChange={(e) => setPackageName(e.target.value)}
+            disabled={isBooting || isInstalling}
+            style={{ padding: "2px 5px" }}
+          />
+          <button
+            onClick={onInstall}
+            disabled={isBooting || isInstalling || !packageName}
+          >
+            {isInstalling ? "Installing..." : "Install"}
+          </button>
+        </div>
         <ReactFlow
           nodes={augmentedNodes}
           edges={edges}
