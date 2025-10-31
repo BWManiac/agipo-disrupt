@@ -10,7 +10,7 @@ Follow these steps exactly to see the full workflow:
 
 1.  **Navigate to the Experiment:** Open the application and click the "Go to MVP Experiment" link on the homepage. You will see two nodes on the canvas, already connected.
 
-2.  **Inspect the Code (Optional):** You can resize the nodes by dragging their corners to see the full JavaScript code inside them.
+2.  **Inspect the Code (Optional):** You can resize the code editor within each node by dragging the handle in the bottom-right corner of the text area.
     *   **Node 1** simply outputs a string.
     *   **Node 2** uses the `cowsay` package to display a message it receives from its input.
 

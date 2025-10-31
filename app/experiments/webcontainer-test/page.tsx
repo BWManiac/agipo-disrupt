@@ -10,11 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,20 +56,14 @@ function CodeNode({ data }) {
       <CardContent>
         <div className="grid w-full gap-1.5">
           <Label htmlFor={`code-${data.id}`}>Code</Label>
-          <ResizablePanelGroup
-            direction="vertical"
-            className="min-h-[200px] w-full rounded-lg border"
-          >
-            <ResizablePanel defaultSize={100}>
-              <Textarea
-                id={`code-${data.id}`}
-                defaultValue={data.code}
-                onChange={onChange}
-                className="h-full w-full resize-none"
-              />
-            </ResizablePanel>
-            <ResizableHandle withHandle />
-          </ResizablePanelGroup>
+          <Textarea
+            id={`code-${data.id}`}
+            defaultValue={data.code}
+            onChange={onChange}
+            className="nodrag"
+            style={{ resize: "vertical" }}
+            onPointerDownCapture={(e) => e.stopPropagation()}
+          />
         </div>
       </CardContent>
       <Handle type="source" position={Position.Bottom} />
