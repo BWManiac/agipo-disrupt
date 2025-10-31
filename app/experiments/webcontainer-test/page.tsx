@@ -95,6 +95,7 @@ export default function WebcontainerTestPage() {
   const [output, setOutput] = useState("");
   const [packageName, setPackageName] = useState("cowsay");
   const [isInstalling, setIsInstalling] = useState(false);
+  const [activeTab, setActiveTab] = useState("console");
 
   const nodeTypes = useMemo(() => ({ code: CodeNode }), []);
 
@@ -327,17 +328,63 @@ export default function WebcontainerTestPage() {
           fontFamily: "monospace",
           backgroundColor: "#f7f7f7",
           overflow: "auto",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        <h2>State</h2>
-        <h3>Nodes</h3>
-        <pre>{JSON.stringify(nodes, null, 2)}</pre>
-        <h3>Edges</h3>
-        <pre>{JSON.stringify(edges, null, 2)}</pre>
-        <h3>Output</h3>
-        <pre style={{ background: "black", color: "white", padding: 10 }}>
-          {output}
-        </pre>
+        <div style={{ display: "flex", borderBottom: "1px solid #ccc" }}>
+          <button
+            onClick={() => setActiveTab("state")}
+            style={{
+              padding: "10px",
+              border: "none",
+              background: activeTab === "state" ? "#eee" : "transparent",
+              cursor: "pointer",
+              borderRight: "1px solid #ccc",
+            }}
+          >
+            State
+          </button>
+          <button
+            onClick={() => setActiveTab("console")}
+            style={{
+              padding: "10px",
+              border: "none",
+              background: activeTab === "console" ? "#eee" : "transparent",
+              cursor: "pointer",
+            }}
+          >
+            Console
+          </button>
+        </div>
+
+        <div style={{ flexGrow: 1, overflow: "auto", padding: "10px" }}>
+          {activeTab === "state" && (
+            <div>
+              <h3>Nodes</h3>
+              <pre>{JSON.stringify(nodes, null, 2)}</pre>
+              <h3>Edges</h3>
+              <pre>{JSON.stringify(edges, null, 2)}</pre>
+            </div>
+          )}
+
+          {activeTab === "console" && (
+            <div>
+              <h3>Output</h3>
+              <pre
+                style={{
+                  background: "black",
+                  color: "white",
+                  padding: 10,
+                  whiteSpace: "pre-wrap",
+                  wordBreak: "break-all",
+                }}
+              >
+                {output}
+              </pre>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
