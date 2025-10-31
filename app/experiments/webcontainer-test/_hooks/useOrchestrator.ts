@@ -21,7 +21,14 @@ export function useOrchestrator() {
       webcontainerInstance.current = instance;
       setIsBooting(false);
     };
+
     bootWebContainer();
+
+    return () => {
+      if (webcontainerInstance.current) {
+        webcontainerInstance.current.teardown();
+      }
+    };
   }, []);
 
   const onConnect = useCallback(
