@@ -1,26 +1,41 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNodesState, useEdgesState, addEdge } from "@xyflow/react";
-import { WebContainer } from "@webcontainer/api";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  initialNodes,
-  initialEdges,
-  WorkflowNode,
-  WorkflowNodeData,
-} from "../_state";
+  addEdge,
+  useEdgesState,
+  useNodesState,
+} from "@xyflow/react";
+import type {
+  Connection,
+  NodeChange,
+  OnNodesChange,
+} from "@xyflow/react";
+
+import {
+  ensureRuntimeReady,
+  installDependency,
+  runWorkflow,
+  teardownRuntime,
+} from "../_services/workflowExecutionService";
+import { initialWorkflow } from "../_state/initialWorkflow";
+import { createWorkflow } from "../_domain/workflow";
+import type { WorkflowNode } from "../_domain/workflow";
+import { markChainRunning, appendOutput } from "../_application/orchestratorState";
+import {
+  toAugmentedNodes,
+  toContracts,
+} from "../_presenters/flowAdapters";
+import type { AugmentedWorkflowNode } from "../_presenters/flowAdapters";
 
 let id = 3;
 const getNewId = () => `${id++}`;
 
-let webcontainerBootPromise: Promise<WebContainer> | null = null;
-
 type WorkflowLayer = "flow" | "spec" | "code";
 
 export function useOrchestrator() {
-  const [nodes, setNodes, onNodesChange] = useNodesState<WorkflowNodeData>(
-    initialNodes
+  const [nodes, setNodes, onNodesChangeInternal] = useNodesState<WorkflowNode>(
+    initialWorkflow.nodes
   );
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const webcontainerInstance = useRef(null);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialWorkflow.edges);
   const [isBooting, setIsBooting] = useState(true);
   const [output, setOutput] = useState("");
   const [packageName, setPackageName] = useState("cowsay");
@@ -28,52 +43,53 @@ export function useOrchestrator() {
   const [activeLayer, setActiveLayer] = useState<WorkflowLayer>("flow");
 
   useEffect(() => {
-    const bootWebContainer = async () => {
-      if (!webcontainerBootPromise) {
-        webcontainerBootPromise = WebContainer.boot();
-      }
+    let isMounted = true;
 
-      const instance = await webcontainerBootPromise;
-      webcontainerInstance.current = instance;
-      setIsBooting(false);
+    const bootRuntime = async () => {
+      try {
+        await ensureRuntimeReady();
+      } finally {
+        if (isMounted) {
+          setIsBooting(false);
+        }
+      }
     };
 
-    bootWebContainer();
+    bootRuntime();
 
     return () => {
-      const instance = webcontainerInstance.current;
-      if (instance) {
-        instance.teardown();
-        webcontainerInstance.current = null;
-        webcontainerBootPromise = null;
-      }
+      isMounted = false;
+      teardownRuntime();
     };
   }, []);
 
   const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
+    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
     [setEdges]
   );
 
+  const onNodesChange = useCallback<OnNodesChange<AugmentedWorkflowNode>>(
+    (changes) =>
+      onNodesChangeInternal(changes as NodeChange<WorkflowNode>[]),
+    [onNodesChangeInternal]
+  );
+
   const handleNodeCodeChange = useCallback(
-    (id, code) => {
-      setNodes((nds) =>
-        nds.map((node) => {
-          if (node.id === id) {
-            return { ...node, data: { ...node.data, code } };
-          }
-          return node;
-        })
+    (nodeId: string, code: string) => {
+      setNodes((currentNodes) =>
+        currentNodes.map((node) =>
+          node.id === nodeId ? { ...node, data: { ...node.data, code } } : node
+        )
       );
     },
     [setNodes]
   );
 
   const handleFlowChange = useCallback(
-    (id: string, summary: string) => {
-      setNodes((nds) =>
-        nds.map((node) =>
-          node.id === id
+    (nodeId: string, summary: string) => {
+      setNodes((currentNodes) =>
+        currentNodes.map((node) =>
+          node.id === nodeId
             ? {
                 ...node,
                 data: {
@@ -115,134 +131,48 @@ export function useOrchestrator() {
         y: Math.random() * window.innerHeight,
       },
     };
-    setNodes((nds) => nds.concat(newNode));
+    setNodes((currentNodes) => currentNodes.concat(newNode));
   }, [setNodes]);
 
   const onInstall = useCallback(async () => {
-    if (!webcontainerInstance.current || !packageName) return;
+    if (!packageName) {
+      return;
+    }
 
     setIsInstalling(true);
     setOutput(`Installing ${packageName}...\n`);
 
-    const command = `cd /tmp && npm install ${packageName}`;
-    const process = await webcontainerInstance.current.spawn("sh", [
-      "-c",
-      command,
-    ]);
-
-    process.output.pipeTo(
-      new WritableStream({
-        write(data) {
-          setOutput((prev) => prev + data);
-        },
-      })
-    );
-
-    await process.exit;
-    setIsInstalling(false);
+    try {
+      await installDependency(packageName, (chunk) =>
+        appendOutput(setOutput, chunk)
+      );
+    } finally {
+      setIsInstalling(false);
+    }
   }, [packageName]);
 
   const onRun = useCallback(async () => {
-    if (!webcontainerInstance.current) return;
     setOutput("");
 
-    // Find all chains of execution
-    const sourceNodes = nodes.filter(
-      (node) => !edges.some((edge) => edge.target === node.id)
-    );
+    const workflow = createWorkflow(nodes, edges);
 
-    const executionChains = sourceNodes.map((sourceNode) => {
-      const chain = [sourceNode];
-      let currentNode = sourceNode;
-      while (currentNode) {
-        const nextEdge = edges.find((edge) => edge.source === currentNode.id);
-        if (nextEdge) {
-          const nextNode = nodes.find((node) => node.id === nextEdge.target);
-          if (nextNode) {
-            chain.push(nextNode);
-            currentNode = nextNode;
-          } else {
-            currentNode = null;
-          }
-        } else {
-          currentNode = null;
-        }
-      }
-      return chain;
+    await runWorkflow(workflow, (chunk) => appendOutput(setOutput, chunk), {
+      onChainStart: (chain) => markChainRunning(setNodes, chain, true),
+      onChainComplete: (chain) => markChainRunning(setNodes, chain, false),
     });
-
-    // Execute each chain
-    for (const chain of executionChains) {
-      // Set isRunning on all nodes in the chain
-      setNodes((nds) =>
-        nds.map((n) =>
-          chain.some((cn) => cn.id === n.id)
-            ? { ...n, data: { ...n.data, isRunning: true } }
-            : n
-        )
-      );
-
-      const writeCommands = chain
-        .map(
-          (node) =>
-            `echo '${node.data.code.replace(/'/g, `'\\''`)}' > /tmp/node-${
-              node.id
-            }.js`
-        )
-        .join(" && ");
-
-      const executeCommands = chain
-        .map((node) => `node /tmp/node-${node.id}.js`)
-        .join(" | ");
-
-      const fullCommand = `cd /tmp && ${writeCommands} && ${executeCommands}`;
-
-      const process = await webcontainerInstance.current.spawn("sh", [
-        "-c",
-        fullCommand,
-      ]);
-
-      process.output.pipeTo(
-        new WritableStream({
-          write(data) {
-            setOutput((prev) => prev + data);
-          },
-        })
-      );
-
-      await process.exit;
-
-      // Unset isRunning on all nodes in the chain
-      setNodes((nds) =>
-        nds.map((n) =>
-          chain.some((cn) => cn.id === n.id)
-            ? { ...n, data: { ...n.data, isRunning: false } }
-            : n
-        )
-      );
-    }
   }, [nodes, edges, setNodes]);
 
-  const augmentedNodes = useMemo(() => {
-    return nodes.map((node) => ({
-      ...node,
-      data: {
-        ...node.data,
-        onChange: handleNodeCodeChange,
+  const augmentedNodes = useMemo(
+    () =>
+      toAugmentedNodes(nodes, {
+        onCodeChange: handleNodeCodeChange,
         onFlowChange: handleFlowChange,
         activeLayer,
-      },
-    }));
-  }, [nodes, handleNodeCodeChange, handleFlowChange, activeLayer]);
+      }),
+    [nodes, handleNodeCodeChange, handleFlowChange, activeLayer]
+  );
 
-  const contracts = useMemo(() => {
-    return nodes.map((node) => ({
-      id: node.id,
-      title: node.data.title,
-      flow: node.data.flow,
-      spec: node.data.spec,
-    }));
-  }, [nodes]);
+  const contracts = useMemo(() => toContracts(nodes), [nodes]);
 
   return {
     nodes,

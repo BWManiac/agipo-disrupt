@@ -10,6 +10,7 @@ import { CodeContent } from "./code-node/CodeContent";
 
 type CodeNodeData = WorkflowNodeData & {
   onChange: (id: string, code: string) => void;
+  onFlowChange: (id: string, summary: string) => void;
   activeLayer: "flow" | "spec" | "code";
 };
 
