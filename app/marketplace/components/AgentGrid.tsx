@@ -20,10 +20,11 @@ export function AgentGrid() {
       buildPreviewAgent({
         title: agent.title,
         rating: agent.rating,
-        reviews: agent.reviews,
+        reviewCount: agent.reviews,
         description: agent.description,
         initials: agent.initials,
         badge: agent.badge,
+        creator: agent.verified ? "AGIPO" : "Community",
         verified: agent.verified,
       })
     );

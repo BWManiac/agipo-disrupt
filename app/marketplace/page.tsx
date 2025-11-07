@@ -1,6 +1,5 @@
 import {
   AgentGrid,
-  AgentPreviewDrawer,
   CreatorSpotlight,
   FeaturedCollections,
   FilterSidebar,
@@ -17,10 +16,7 @@ export default function MarketplacePage() {
         <FeaturedCollections />
         <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
           <FilterSidebar />
-          <div className="flex flex-col gap-6">
-            <AgentGrid />
-            <AgentPreviewDrawer />
-          </div>
+          <AgentGrid />
         </div>
         <TrustStrip />
         <CreatorSpotlight />

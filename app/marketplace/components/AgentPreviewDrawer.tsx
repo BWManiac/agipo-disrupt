@@ -10,9 +10,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { cn } from "@/lib/utils";
 
-export type PreviewAgent = typeof previewAgent;
+export type PreviewAgent = typeof previewAgent & { reviewCount?: number };
 
 export function AgentPreviewDrawer({
   open,
@@ -61,7 +60,7 @@ function AgentDetails({ agent }: { agent: PreviewAgent }) {
             </Badge>
           )}
           <span className="text-sm font-medium text-slate-900">
-            {agent.rating.toFixed(1)} • {agent.reviews.toLocaleString()} reviews
+            {agent.rating.toFixed(1)} • {(agent.reviewCount ?? previewAgent.reviewCount).toLocaleString()} reviews
           </span>
         </div>
         <p className="text-sm text-muted-foreground">{agent.description}</p>
@@ -145,9 +144,10 @@ export function buildPreviewAgent(partial: {
   title: string;
   initials: string;
   rating: number;
-  reviews: number;
+  reviewCount: number;
   description: string;
   badge: string;
+  creator?: string;
   verified?: boolean;
 }) {
   return {
