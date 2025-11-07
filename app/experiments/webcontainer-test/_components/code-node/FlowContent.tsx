@@ -13,7 +13,9 @@ export function FlowContent({
         value={data.flow.summary}
         onChange={(evt) => data.onFlowChange(data.id, evt.target.value)}
         placeholder="Describe what happens in this step."
-        className="min-h-[120px] resize-y"
+        className="min-h-[120px] resize-y nodrag"
+        style={{ resize: "vertical" }}
+        onPointerDownCapture={(event) => event.stopPropagation()}
       />
     </div>
   );
