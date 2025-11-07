@@ -18,6 +18,8 @@ export default function WebcontainerTestPage() {
     packageName,
     isBooting,
     isInstalling,
+    activeLayer,
+    contracts,
     augmentedNodes,
     onNodesChange,
     onEdgesChange,
@@ -26,6 +28,7 @@ export default function WebcontainerTestPage() {
     onRun,
     onInstall,
     setPackageName,
+    setActiveLayer,
   } = useOrchestrator();
 
   const nodeTypes = useMemo(() => ({ code: CodeNode }), []);
@@ -41,6 +44,8 @@ export default function WebcontainerTestPage() {
           isInstalling={isInstalling}
           packageName={packageName}
           setPackageName={setPackageName}
+          activeLayer={activeLayer}
+          onLayerChange={setActiveLayer}
         />
         <ReactFlow
           nodes={augmentedNodes}
@@ -54,7 +59,13 @@ export default function WebcontainerTestPage() {
           <Background />
         </ReactFlow>
       </div>
-      <Sidebar nodes={nodes} edges={edges} output={output} />
+      <Sidebar
+        nodes={nodes}
+        edges={edges}
+        output={output}
+        activeLayer={activeLayer}
+        contracts={contracts}
+      />
     </div>
   );
 }

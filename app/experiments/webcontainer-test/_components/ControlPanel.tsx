@@ -4,6 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 
+type WorkflowLayer = "flow" | "spec" | "code";
+
+interface ControlPanelProps {
+  onAdd: () => void;
+  onRun: () => void;
+  onInstall: () => void;
+  isBooting: boolean;
+  isInstalling: boolean;
+  packageName: string;
+  setPackageName: (pkg: string) => void;
+  activeLayer: WorkflowLayer;
+  onLayerChange: (layer: WorkflowLayer) => void;
+}
+
 export function ControlPanel({
   onAdd,
   onRun,
@@ -12,9 +26,11 @@ export function ControlPanel({
   isInstalling,
   packageName,
   setPackageName,
-}) {
+  activeLayer,
+  onLayerChange,
+}: ControlPanelProps) {
   return (
-    <div className="absolute z-10 top-4 left-4 bg-background/90 p-4 rounded-lg shadow-lg flex gap-4 items-center">
+    <div className="absolute top-4 left-1/2 z-10 flex w-full max-w-4xl -translate-x-1/2 items-center justify-between rounded-2xl border border-slate-200 bg-background/90 px-6 py-4 shadow-lg backdrop-blur">
       <Button onClick={onAdd} disabled={isBooting || isInstalling}>
         Add Node
       </Button>
@@ -37,6 +53,26 @@ export function ControlPanel({
         >
           {isInstalling ? "Installing..." : "Install"}
         </Button>
+      </div>
+      <Separator orientation="vertical" className="h-6" />
+      <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white p-1">
+        {(["flow", "spec", "code"] as WorkflowLayer[]).map((layer) => {
+          const isActive = activeLayer === layer;
+          return (
+            <button
+              key={layer}
+              type="button"
+              onClick={() => onLayerChange(layer)}
+              className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${
+                isActive
+                  ? "bg-blue-600 text-white shadow"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              {layer.charAt(0).toUpperCase() + layer.slice(1)}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

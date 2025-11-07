@@ -1,21 +1,31 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNodesState, useEdgesState, addEdge } from "@xyflow/react";
 import { WebContainer } from "@webcontainer/api";
-import { initialNodes, initialEdges } from "../_state";
+import {
+  initialNodes,
+  initialEdges,
+  WorkflowNode,
+  WorkflowNodeData,
+} from "../_state";
 
 let id = 3;
 const getNewId = () => `${id++}`;
 
 let webcontainerBootPromise: Promise<WebContainer> | null = null;
 
+type WorkflowLayer = "flow" | "spec" | "code";
+
 export function useOrchestrator() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [nodes, setNodes, onNodesChange] = useNodesState<WorkflowNodeData>(
+    initialNodes
+  );
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const webcontainerInstance = useRef(null);
   const [isBooting, setIsBooting] = useState(true);
   const [output, setOutput] = useState("");
   const [packageName, setPackageName] = useState("cowsay");
   const [isInstalling, setIsInstalling] = useState(false);
+  const [activeLayer, setActiveLayer] = useState<WorkflowLayer>("flow");
 
   useEffect(() => {
     const bootWebContainer = async () => {
@@ -61,10 +71,23 @@ export function useOrchestrator() {
 
   const onAdd = useCallback(() => {
     const newId = getNewId();
-    const newNode = {
+    const newNode: WorkflowNode = {
       id: newId,
       type: "code",
-      data: { id: newId, code: "// New Node", isRunning: false },
+      data: {
+        id: newId,
+        title: `Node ${newId}`,
+        code: "// New Node",
+        isRunning: false,
+        flow: {
+          summary: "Describe this step to help teammates understand the flow.",
+        },
+        spec: {
+          inputs: [],
+          process: ["Document the transformation logic here."],
+          outputs: [],
+        },
+      },
       position: {
         x: Math.random() * window.innerWidth - 100,
         y: Math.random() * window.innerHeight,
@@ -184,9 +207,19 @@ export function useOrchestrator() {
       data: {
         ...node.data,
         onChange: handleNodeCodeChange,
+        activeLayer,
       },
     }));
-  }, [nodes, handleNodeCodeChange]);
+  }, [nodes, handleNodeCodeChange, activeLayer]);
+
+  const contracts = useMemo(() => {
+    return nodes.map((node) => ({
+      id: node.id,
+      title: node.data.title,
+      flow: node.data.flow,
+      spec: node.data.spec,
+    }));
+  }, [nodes]);
 
   return {
     nodes,
@@ -195,6 +228,8 @@ export function useOrchestrator() {
     packageName,
     isBooting,
     isInstalling,
+    activeLayer,
+    contracts,
     augmentedNodes,
     onNodesChange,
     onEdgesChange,
@@ -203,5 +238,6 @@ export function useOrchestrator() {
     onRun,
     onInstall,
     setPackageName,
+    setActiveLayer,
   };
 }
