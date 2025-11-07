@@ -6,6 +6,8 @@ import { initialNodes, initialEdges } from "../_state";
 let id = 3;
 const getNewId = () => `${id++}`;
 
+let webcontainerBootPromise: Promise<WebContainer> | null = null;
+
 export function useOrchestrator() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -17,7 +19,11 @@ export function useOrchestrator() {
 
   useEffect(() => {
     const bootWebContainer = async () => {
-      const instance = await WebContainer.boot();
+      if (!webcontainerBootPromise) {
+        webcontainerBootPromise = WebContainer.boot();
+      }
+
+      const instance = await webcontainerBootPromise;
       webcontainerInstance.current = instance;
       setIsBooting(false);
     };
@@ -25,8 +31,11 @@ export function useOrchestrator() {
     bootWebContainer();
 
     return () => {
-      if (webcontainerInstance.current) {
-        webcontainerInstance.current.teardown();
+      const instance = webcontainerInstance.current;
+      if (instance) {
+        instance.teardown();
+        webcontainerInstance.current = null;
+        webcontainerBootPromise = null;
       }
     };
   }, []);
