@@ -69,6 +69,28 @@ export function useOrchestrator() {
     [setNodes]
   );
 
+  const handleFlowChange = useCallback(
+    (id: string, summary: string) => {
+      setNodes((nds) =>
+        nds.map((node) =>
+          node.id === id
+            ? {
+                ...node,
+                data: {
+                  ...node.data,
+                  flow: {
+                    ...node.data.flow,
+                    summary,
+                  },
+                },
+              }
+            : node
+        )
+      );
+    },
+    [setNodes]
+  );
+
   const onAdd = useCallback(() => {
     const newId = getNewId();
     const newNode: WorkflowNode = {
@@ -207,10 +229,11 @@ export function useOrchestrator() {
       data: {
         ...node.data,
         onChange: handleNodeCodeChange,
+        onFlowChange: handleFlowChange,
         activeLayer,
       },
     }));
-  }, [nodes, handleNodeCodeChange, activeLayer]);
+  }, [nodes, handleNodeCodeChange, handleFlowChange, activeLayer]);
 
   const contracts = useMemo(() => {
     return nodes.map((node) => ({
