@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { rotatingMessages, heroTrustCopy } from "../data/mock-data";
@@ -36,11 +37,16 @@ export function HeroSection() {
           {rotatingMessages[messageIndex]}
         </div>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Button size="lg" className="px-6 py-6 text-base">
-            Create an agent
+          <Button size="lg" className="px-6 py-6 text-base" asChild>
+            <Link href="/experiments/webcontainer-test">Create an agent</Link>
           </Button>
-          <Button variant="outline" size="lg" className="px-6 py-6 text-base">
-            Browse marketplace
+          <Button
+            variant="outline"
+            size="lg"
+            className="px-6 py-6 text-base"
+            asChild
+          >
+            <Link href="/marketplace">Browse marketplace</Link>
           </Button>
         </div>
         <p className="mt-4 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
