@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Workflow Builder – Multilayer View Mock</title>
+    <style>
+      :root {
+        --bg: #f9fafb;
+        --panel: #ffffff;
+        --border: #e2e8f0;
+        --text: #0f172a;
+        --muted: #475569;
+        --primary: #0f172a;
+        --accent: #2563eb;
+        --accent-muted: #dbeafe;
+        --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .toolbar {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .actions {
+        display: inline-flex;
+        gap: 8px;
+      }
+
+      .actions button {
+        padding: 10px 16px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: #101828;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.15);
+      }
+
+      .actions button.secondary {
+        background: #fff;
+        color: var(--text);
+      }
+
+      .search {
+        position: relative;
+        flex: 1;
+        max-width: 200px;
+      }
+
+      .search input {
+        width: 100%;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        padding: 9px 16px;
+        font-size: 14px;
+      }
+
+      .layer-toggle {
+        margin-left: auto;
+        background: var(--panel);
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        display: inline-flex;
+        padding: 4px;
+        gap: 4px;
+      }
+
+      .layer-toggle button {
+        border: none;
+        padding: 10px 18px;
+        border-radius: 999px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--muted);
+        background: transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .layer-toggle button.active {
+        background: var(--accent);
+        color: #fff;
+        box-shadow: 0 1px 2px rgba(37, 99, 235, 0.35);
+      }
+
+      main {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 32px 48px 64px;
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 24px;
+      }
+
+      .canvas {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 32px;
+        min-height: 680px;
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.04);
+        position: relative;
+      }
+
+      .canvas h2 {
+        margin: 0 0 12px;
+        font-size: 18px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+      }
+
+      .layer-content {
+        margin-top: 24px;
+        display: none;
+        gap: 24px;
+      }
+
+      .layer-content.active {
+        display: grid;
+      }
+
+      .flowchart {
+        display: grid;
+        gap: 16px;
+        justify-items: center;
+      }
+
+      .flow-node {
+        background: #f8fafc;
+        border-radius: 20px;
+        padding: 20px 28px;
+        border: 1px solid var(--border);
+        width: 280px;
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+        text-align: left;
+      }
+
+      .flow-node h3 {
+        margin: 0 0 12px;
+        font-size: 16px;
+        font-weight: 700;
+        text-align: center;
+      }
+
+      .flow-pill {
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: #fff;
+        padding: 10px 14px;
+        margin-bottom: 10px;
+      }
+
+      .flow-pill strong {
+        display: block;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .flow-pill code,
+      .flow-pill span {
+        font-size: 12px;
+        color: var(--text);
+      }
+
+      .flow-pill span {
+        display: block;
+        line-height: 1.4;
+        margin-top: 4px;
+      }
+
+      .arrow {
+        width: 2px;
+        background: var(--border);
+        height: 40px;
+      }
+
+      .flow-steps {
+        display: grid;
+        gap: 16px;
+      }
+
+      .flow-step {
+        background: #f8fafc;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        padding: 18px 22px;
+        display: grid;
+        gap: 6px;
+      }
+
+      .flow-step-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .step-index {
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: var(--accent-muted);
+        color: var(--accent);
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+      }
+
+      .flow-step-title {
+        font-weight: 600;
+      }
+
+      .flow-step-desc {
+        font-size: 14px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .ipo-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .ipo-card {
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        background: #f8fafc;
+        padding: 20px;
+      }
+
+      .ipo-card h4 {
+        margin: 0 0 12px;
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+      }
+
+      .ipo-card p {
+        margin: 0;
+        line-height: 1.5;
+        font-size: 14px;
+      }
+
+      .code-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+      }
+
+      .code-slab {
+        border-radius: 18px;
+        background: #101828;
+        color: #e2e8f0;
+        padding: 20px;
+        font-family: "JetBrains Mono", "Fira Code", monospace;
+        font-size: 13px;
+        line-height: 1.6;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+      }
+
+      aside {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+      }
+
+      aside h3 {
+        margin-top: 0;
+        font-size: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--muted);
+      }
+
+      aside section + section {
+        margin-top: 20px;
+      }
+
+      .meta-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .meta-item:last-child {
+        border-bottom: none;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: var(--accent-muted);
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="toolbar">
+        <div class="actions">
+          <button>Add Node</button>
+          <button>Run</button>
+          <div class="search">
+            <input type="text" value="cowsay" />
+          </div>
+          <button class="secondary">Install</button>
+        </div>
+        <div class="layer-toggle" role="tablist" aria-label="Layer switcher">
+          <button class="active" role="tab" aria-selected="true" data-target="flow" tabindex="0">Flow</button>
+          <button role="tab" aria-selected="false" data-target="spec" tabindex="-1">Spec</button>
+          <button role="tab" aria-selected="false" data-target="code" tabindex="-1">Code</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="canvas">
+        <h2>Flow View</h2>
+        <div class="layer-content active" id="layer-flow" role="tabpanel" aria-label="Flow layer">
+          <div class="flow-steps">
+            <div class="flow-step">
+              <div class="flow-step-header">
+                <span class="step-index">1</span>
+                <span class="flow-step-title">Collect Input</span>
+              </div>
+              <p class="flow-step-desc">Listen for the user's prompt and optional tone hint, then tidy the sentence so it's ready for formatting.</p>
+            </div>
+            <div class="flow-step">
+              <div class="flow-step-header">
+                <span class="step-index">2</span>
+                <span class="flow-step-title">Format Message</span>
+              </div>
+              <p class="flow-step-desc">Drop the cleaned text into the cowsay template, layering on the requested tone while keeping line lengths short.</p>
+            </div>
+            <div class="flow-step">
+              <div class="flow-step-header">
+                <span class="step-index">3</span>
+                <span class="flow-step-title">Deliver Output</span>
+              </div>
+              <p class="flow-step-desc">Return the finished ASCII cow along with a quick width/height note so downstream UIs know how to display it.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="layer-content" id="layer-spec" role="tabpanel" aria-label="Spec layer">
+          <div class="flowchart">
+            <div class="flow-node">
+              <h3>Collect Input</h3>
+              <div class="flow-pill">
+                <strong>Input</strong>
+                <code>message: string</code>, <code>tone?: string</code>
+              </div>
+              <div class="flow-pill">
+                <strong>Process</strong>
+                <span>1. Trim whitespace.<br />2. Remove unsupported characters.<br />3. Default missing tone to "fun".</span>
+              </div>
+              <div class="flow-pill">
+                <strong>Output</strong>
+                <code>cleanMessage: string</code>, <code>toneLabel: string</code>
+              </div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-node">
+              <h3>Format Message</h3>
+              <div class="flow-pill">
+                <strong>Input</strong>
+                <code>cleanMessage: string</code>, <code>toneLabel: string</code>
+              </div>
+              <div class="flow-pill">
+                <strong>Process</strong>
+                <span>1. Load cowsay template.<br />2. Apply tone modifiers.<br />3. Wrap lines to 40 characters.</span>
+              </div>
+              <div class="flow-pill">
+                <strong>Output</strong>
+                <code>formattedMessage: string</code>
+              </div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-node">
+              <h3>Deliver Output</h3>
+              <div class="flow-pill">
+                <strong>Input</strong>
+                <code>formattedMessage: string</code>
+              </div>
+              <div class="flow-pill">
+                <strong>Process</strong>
+                <span>1. Render ASCII art.<br />2. Measure width & height.<br />3. Package response payload.</span>
+              </div>
+              <div class="flow-pill">
+                <strong>Output</strong>
+                <code>asciiArt: string</code>, <code>width: number</code>, <code>height: number</code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="layer-content" id="layer-code" role="tabpanel" aria-label="Code layer">
+          <div class="code-grid">
+            <div class="code-slab">
+{`// node-1.js`}
+const input = require("./inputs").message;
+process.stdout.write(input);
+            </div>
+            <div class="code-slab">
+{`// node-2.js`}
+const cowsay = require("cowsay");
+const readline = require("readline");
+const rl = readline.createInterface({ input: process.stdin });
+
+rl.on("line", (line) => {
+  console.log(
+    cowsay.say({
+      text: line,
+      e: "oO",
+      T: "U ",
+    })
+  );
+});
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside>
+        <h3>Context</h3>
+        <section>
+          <div class="meta-item">
+            <span>Active Layer</span>
+            <span class="chip" id="active-layer-chip">Flow</span>
+          </div>
+          <div class="meta-item">
+            <span>Selected Nodes</span>
+            <span>Node 1 & Node 2</span>
+          </div>
+        </section>
+        <section>
+          <strong style="display: block; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px;">Contract Snapshot</strong>
+          <p style="margin: 0; font-size: 13px; line-height: 1.6; color: var(--muted);">
+            `Node 1` outputs <code>cleanMessage: string</code>. `Node 2` requires
+            <code>cleanMessage: string</code>.<br /> Optional adapters: <code>richText → string</code>.
+          </p>
+        </section>
+      </aside>
+    </main>
+
+    <script>
+      const toggle = document.querySelector(".layer-toggle");
+      const buttons = Array.from(toggle.querySelectorAll("button"));
+      const layers = {
+        flow: document.getElementById("layer-flow"),
+        spec: document.getElementById("layer-spec"),
+        code: document.getElementById("layer-code"),
+      };
+      const chip = document.getElementById("active-layer-chip");
+
+      function activate(target) {
+        buttons.forEach((btn) => {
+          const isActive = btn.dataset.target === target;
+          btn.classList.toggle("active", isActive);
+          btn.setAttribute("aria-selected", String(isActive));
+          btn.setAttribute("tabindex", isActive ? "0" : "-1");
+        });
+
+        Object.entries(layers).forEach(([key, panel]) => {
+          panel.classList.toggle("active", key === target);
+          panel.hidden = key !== target;
+        });
+
+        chip.textContent =
+          target === "flow" ? "Flow" : target === "spec" ? "Spec" : "Code";
+      }
+
+      toggle.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-target]");
+        if (!button) return;
+        activate(button.dataset.target);
+      });
+
+      toggle.addEventListener("keydown", (event) => {
+        if (!["ArrowRight", "ArrowLeft"].includes(event.key)) return;
+        const currentIndex = buttons.findIndex((btn) => btn.classList.contains("active"));
+        const nextIndex =
+          event.key === "ArrowRight"
+            ? (currentIndex + 1) % buttons.length
+            : (currentIndex - 1 + buttons.length) % buttons.length;
+        buttons[nextIndex].focus();
+        activate(buttons[nextIndex].dataset.target);
+      });
+
+      // Ensure hidden attribute reflects initial state
+      Object.entries(layers).forEach(([key, panel]) => {
+        panel.hidden = !panel.classList.contains("active");
+      });
+    </script>
+  </body>
+</html>
+
