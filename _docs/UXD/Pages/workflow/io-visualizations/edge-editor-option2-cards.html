@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edge Editor Option 2 – Card Layout</title>
+    <style>
+      :root {
+        --background: 0 0% 100%;
+        --foreground: 222.2 84% 4.9%;
+        --card: 0 0% 100%;
+        --card-foreground: 222.2 84% 4.9%;
+        --primary: 221.2 83.2% 53.3%;
+        --primary-foreground: 210 40% 98%;
+        --secondary: 210 40% 96.1%;
+        --secondary-foreground: 222.2 47.4% 11.2%;
+        --muted: 210 40% 96.1%;
+        --muted-foreground: 215.4 16.3% 46.9%;
+        --border: 214.3 31.8% 91.4%;
+        --radius: 0.5rem;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: hsl(var(--muted) / 0.3);
+        color: hsl(var(--foreground));
+        padding: 2rem;
+        line-height: 1.5;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+      }
+
+      .subtitle {
+        font-size: 0.875rem;
+        color: hsl(var(--muted-foreground));
+        margin-bottom: 1.5rem;
+      }
+
+      .mapping-card {
+        background: hsl(var(--card));
+        border: 1px solid hsl(var(--border));
+        border-radius: calc(var(--radius) + 2px);
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.2s;
+      }
+
+      .mapping-card:hover {
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        border-color: hsl(var(--primary) / 0.3);
+      }
+
+      .card-status {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.25rem 0.625rem;
+        border-radius: calc(var(--radius));
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .status-linked {
+        background: hsl(142.1 76.2% 36.3% / 0.15);
+        color: hsl(142.1 70.6% 45.3%);
+      }
+
+      .status-missing {
+        background: hsl(var(--primary) / 0.1);
+        color: hsl(var(--primary));
+      }
+
+      .flow-container {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 1rem;
+        align-items: center;
+      }
+
+      .field-box {
+        padding: 0.75rem;
+        background: hsl(var(--muted) / 0.5);
+        border: 1px solid hsl(var(--border));
+        border-radius: var(--radius);
+      }
+
+      .field-label {
+        font-size: 0.6875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: hsl(var(--muted-foreground));
+        margin-bottom: 0.25rem;
+      }
+
+      .field-name {
+        font-weight: 600;
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .field-type {
+        display: inline-flex;
+        padding: 0.125rem 0.5rem;
+        background: hsl(var(--primary) / 0.1);
+        color: hsl(var(--primary));
+        border-radius: calc(var(--radius) - 2px);
+        font-size: 0.6875rem;
+        font-weight: 600;
+      }
+
+      .arrow {
+        font-size: 1.5rem;
+        color: hsl(var(--muted-foreground));
+      }
+
+      .arrow.active {
+        color: hsl(var(--primary));
+      }
+
+      .field-description {
+        margin-top: 0.5rem;
+        font-size: 0.8125rem;
+        color: hsl(var(--muted-foreground));
+        font-style: italic;
+      }
+
+      select {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid hsl(var(--input));
+        border-radius: var(--radius);
+        font-size: 0.875rem;
+        background: hsl(var(--background));
+        color: hsl(var(--foreground));
+      }
+
+      select:focus {
+        outline: none;
+        border-color: hsl(var(--ring));
+        box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+      }
+
+      .empty-prompt {
+        padding: 0.75rem;
+        background: hsl(var(--muted) / 0.5);
+        border: 1px dashed hsl(var(--border));
+        border-radius: var(--radius);
+        font-size: 0.8125rem;
+        color: hsl(var(--muted-foreground));
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Edge Data Mapping</h1>
+      <p class="subtitle">Collect Input → Format Message</p>
+
+      <!-- Linked mapping -->
+      <div class="mapping-card">
+        <div class="card-status">
+          <span class="field-label">Binding 1</span>
+          <span class="status-badge status-linked">✓ Linked</span>
+        </div>
+        <div class="flow-container">
+          <div class="field-box">
+            <div class="field-label">Source Output</div>
+            <div class="field-name">cleanMessage</div>
+            <span class="field-type">Text</span>
+            <p class="field-description">Sanitized text from upstream</p>
+          </div>
+          <span class="arrow active">→</span>
+          <div class="field-box">
+            <div class="field-label">Target Input</div>
+            <div class="field-name">message</div>
+            <span class="field-type">Text</span>
+            <p class="field-description">Input for formatter</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unlinked mapping needing selection -->
+      <div class="mapping-card">
+        <div class="card-status">
+          <span class="field-label">Binding 2</span>
+          <span class="status-badge status-missing">Needs mapping</span>
+        </div>
+        <div class="flow-container">
+          <div class="field-box">
+            <div class="field-label">Source Output</div>
+            <select>
+              <option selected disabled>Select source...</option>
+              <option>cleanMessage (Text)</option>
+              <option>timestamp (Number)</option>
+              <option>— Use default value —</option>
+            </select>
+          </div>
+          <span class="arrow">→</span>
+          <div class="field-box">
+            <div class="field-label">Target Input</div>
+            <div class="field-name">stylePreset</div>
+            <span class="field-type">Text</span>
+            <p class="field-description">Visual style preference</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty state when no mappings configured yet -->
+      <div class="mapping-card">
+        <div class="empty-prompt">
+          No additional mappings defined. All required inputs are satisfied.
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+

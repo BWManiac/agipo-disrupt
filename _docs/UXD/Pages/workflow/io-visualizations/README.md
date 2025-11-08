@@ -1,6 +1,4 @@
-# IO Visualization Concepts
+# IO Mapping Editor
 
-This directory captures exploratory mocks and notes for representing input/output relationships between nodes in the workflow builder. Each HTML mock explores a different strategy for helping users understand data flow between nodes without overwhelming the canvas.
+This directory contains UX explorations for the new edge-aware editor in the Workflow Generator experiment. The goal is to visualize how data flows between nodes and give users a clear way to bind outputs to downstream inputs. Use the mock HTML alongside the state-design document to align engineering and design decisions before implementation.
 
-Current concepts:
-- `port-to-port-lines.html`: full node mock showing per-parameter ports with curved connectors and inline metadata.

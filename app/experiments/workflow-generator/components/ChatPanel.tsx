@@ -1,6 +1,6 @@
 "use client";
 
-import { DefaultChatTransport } from "ai";
+import { DefaultChatTransport, getToolName, isToolUIPart } from "ai";
 import { useChat } from "@ai-sdk/react";
 import {
   Conversation,
@@ -18,13 +18,39 @@ import {
   PromptInputSubmit,
 } from "@/components/ai-elements/prompt-input";
 import type { PromptInputMessage } from "@/components/ai-elements/prompt-input";
-import { useState } from "react";
+import {
+  Tool,
+  ToolContent,
+  ToolHeader,
+  ToolInput,
+  ToolOutput,
+} from "@/components/ai-elements/tool";
+import { applyToolResult } from "../tools/applyToolResult";
+import type { ToolResult } from "../tools/toolIntents";
+import { useEffect, useRef, useState } from "react";
 
 export function ChatPanel() {
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({ api: "/api/agent" }),
   });
   const [input, setInput] = useState("");
+  const processedToolCallIds = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    for (const message of messages) {
+      for (const part of message.parts) {
+        if (!isToolUIPart(part)) continue;
+        if (part.state !== "output-available") continue;
+        if (processedToolCallIds.current.has(part.toolCallId)) continue;
+
+        processedToolCallIds.current.add(part.toolCallId);
+        const result = part.output as ToolResult | undefined;
+        if (result?.intent) {
+          applyToolResult(result);
+        }
+      }
+    }
+  }, [messages]);
 
   const handlePromptSubmit = ({ text }: PromptInputMessage) => {
     const trimmed = (text ?? "").trim();
@@ -37,6 +63,37 @@ export function ChatPanel() {
 
   const isSending = status === "submitted" || status === "streaming";
   const isSubmitDisabled = isSending || input.trim() === "";
+
+  const renderMessageParts = (messageParts: typeof messages[number]["parts"]) =>
+    messageParts.map((part, idx) => {
+      if (isToolUIPart(part)) {
+        const toolTitle = String(getToolName(part));
+        return (
+          <Tool key={`${part.toolCallId}-${idx}`}>
+            <ToolHeader state={part.state} type={part.type} title={toolTitle} />
+            <ToolContent>
+              {part.input ? <ToolInput input={part.input} /> : null}
+              {part.state === "output-available" && part.output ? (
+                <ToolOutput output={part.output} errorText={part.errorText} />
+              ) : null}
+              {part.state === "output-error" ? (
+                <ToolOutput output={part.output} errorText={part.errorText} />
+              ) : null}
+            </ToolContent>
+          </Tool>
+        );
+      }
+
+      if (part.type === "text") {
+        return (
+          <div key={`text-${idx}`} className="whitespace-pre-wrap">
+            {part.text}
+          </div>
+        );
+      }
+
+      return null;
+    });
 
   return (
     <div
@@ -59,20 +116,11 @@ export function ChatPanel() {
           />
         ) : (
           <ConversationContent>
-            {messages.map((m) => {
-              const textParts = m.parts.filter(
-                (p: { type: string }) => p.type === "text"
-              ) as Array<{ type: "text"; text: string }>;
-              return (
-                <Message from={m.role} key={m.id}>
-                  <MessageContent>
-                    {textParts.map((p, idx) => (
-                      <div key={`${m.id}-${idx}`}>{p.text}</div>
-                    ))}
-                  </MessageContent>
-                </Message>
-              );
-            })}
+            {messages.map((m) => (
+              <Message from={m.role} key={m.id}>
+                <MessageContent>{renderMessageParts(m.parts)}</MessageContent>
+              </Message>
+            ))}
           </ConversationContent>
         )}
         <ConversationScrollButton />

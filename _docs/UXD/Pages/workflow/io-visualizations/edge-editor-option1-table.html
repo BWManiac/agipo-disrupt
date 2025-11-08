@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edge Editor Option 1 – Clean Table</title>
+    <style>
+      :root {
+        --background: 0 0% 100%;
+        --foreground: 222.2 84% 4.9%;
+        --card: 0 0% 100%;
+        --card-foreground: 222.2 84% 4.9%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 222.2 84% 4.9%;
+        --primary: 221.2 83.2% 53.3%;
+        --primary-foreground: 210 40% 98%;
+        --secondary: 210 40% 96.1%;
+        --secondary-foreground: 222.2 47.4% 11.2%;
+        --muted: 210 40% 96.1%;
+        --muted-foreground: 215.4 16.3% 46.9%;
+        --accent: 210 40% 96.1%;
+        --accent-foreground: 222.2 47.4% 11.2%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 214.3 31.8% 91.4%;
+        --input: 214.3 31.8% 91.4%;
+        --ring: 221.2 83.2% 53.3%;
+        --radius: 0.5rem;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: hsl(var(--background));
+        color: hsl(var(--foreground));
+        padding: 2rem;
+        line-height: 1.5;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .subtitle {
+        font-size: 0.875rem;
+        color: hsl(var(--muted-foreground));
+        margin-bottom: 2rem;
+      }
+
+      .card {
+        background: hsl(var(--card));
+        border: 1px solid hsl(var(--border));
+        border-radius: calc(var(--radius) + 2px);
+        padding: 1.5rem;
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid hsl(var(--border));
+      }
+
+      .card-title {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: calc(var(--radius));
+        padding: 0.25rem 0.625rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .badge-default {
+        background: hsl(var(--secondary));
+        color: hsl(var(--secondary-foreground));
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      thead {
+        border-bottom: 1px solid hsl(var(--border));
+      }
+
+      th {
+        text-align: left;
+        padding: 0.75rem 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: hsl(var(--muted-foreground));
+      }
+
+      td {
+        padding: 1rem;
+        border-bottom: 1px solid hsl(var(--border));
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      tbody tr:hover {
+        background: hsl(var(--muted) / 0.3);
+      }
+
+      .field-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      .field-name {
+        font-weight: 500;
+        font-size: 0.875rem;
+      }
+
+      .field-type {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.125rem 0.5rem;
+        background: hsl(var(--primary) / 0.1);
+        color: hsl(var(--primary));
+        border-radius: calc(var(--radius) - 2px);
+        font-size: 0.75rem;
+        font-weight: 600;
+        width: fit-content;
+      }
+
+      .binding-status {
+        text-align: center;
+      }
+
+      .binding-arrow {
+        font-size: 1.25rem;
+        color: hsl(var(--muted-foreground));
+      }
+
+      .status-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.375rem 0.75rem;
+        border-radius: calc(var(--radius));
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .status-linked {
+        background: hsl(142.1 76.2% 36.3% / 0.1);
+        color: hsl(142.1 70.6% 45.3%);
+      }
+
+      .status-unlinked {
+        background: hsl(var(--destructive) / 0.1);
+        color: hsl(var(--destructive));
+      }
+
+      .description {
+        margin-top: 0.375rem;
+        font-size: 0.8125rem;
+        color: hsl(var(--muted-foreground));
+        font-style: italic;
+      }
+
+      select {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid hsl(var(--input));
+        border-radius: calc(var(--radius));
+        font-size: 0.875rem;
+        background: hsl(var(--background));
+        color: hsl(var(--foreground));
+      }
+
+      select:focus {
+        outline: none;
+        border-color: hsl(var(--ring));
+        box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Edge Data Mapping</h1>
+      <p class="subtitle">Collect Input → Format Message</p>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Field Bindings</h2>
+          <span class="badge badge-default">2 of 3 mapped</span>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Source Output</th>
+              <th style="width: 80px; text-align: center">Link</th>
+              <th>Target Input</th>
+              <th style="width: 120px">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Linked binding -->
+            <tr>
+              <td>
+                <div class="field-info">
+                  <div class="field-name">cleanMessage</div>
+                  <span class="field-type">Text</span>
+                  <p class="description">Sanitized text from upstream node</p>
+                </div>
+              </td>
+              <td class="binding-status">
+                <span class="binding-arrow">→</span>
+              </td>
+              <td>
+                <div class="field-info">
+                  <div class="field-name">message</div>
+                  <span class="field-type">Text</span>
+                  <p class="description">Input message for formatting</p>
+                </div>
+              </td>
+              <td>
+                <span class="status-chip status-linked">✓ Linked</span>
+              </td>
+            </tr>
+
+            <!-- Unlinked source field -->
+            <tr>
+              <td>
+                <div class="field-info">
+                  <div class="field-name">timestamp</div>
+                  <span class="field-type">Number</span>
+                  <p class="description">Processing timestamp</p>
+                </div>
+              </td>
+              <td class="binding-status">
+                <span class="binding-arrow" style="opacity: 0.3">→</span>
+              </td>
+              <td>
+                <select>
+                  <option selected disabled>Select target field...</option>
+                  <option>message (Text)</option>
+                  <option>stylePreset (Text)</option>
+                </select>
+              </td>
+              <td>
+                <span class="status-chip status-unlinked">Not linked</span>
+              </td>
+            </tr>
+
+            <!-- Unlinked target field needing input -->
+            <tr>
+              <td>
+                <select>
+                  <option selected disabled>Select source field...</option>
+                  <option>cleanMessage (Text)</option>
+                  <option>timestamp (Number)</option>
+                  <option>— Use default value —</option>
+                </select>
+              </td>
+              <td class="binding-status">
+                <span class="binding-arrow" style="opacity: 0.3">→</span>
+              </td>
+              <td>
+                <div class="field-info">
+                  <div class="field-name">stylePreset</div>
+                  <span class="field-type">Text</span>
+                  <p class="description">Visual style for output</p>
+                </div>
+              </td>
+              <td>
+                <span class="status-chip status-unlinked">Missing</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>
+
