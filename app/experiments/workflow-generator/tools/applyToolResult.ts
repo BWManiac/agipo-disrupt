@@ -1,3 +1,12 @@
+/**
+ * applyToolResult
+ *
+ * Converts structured tool intents emitted by the agent into concrete Zustand
+ * mutations. Keeping this logic in one place:
+ * - Guarantees parity between chat-driven edits and future manual UI actions.
+ * - Makes it easy to audit how each intent shapes the workflow state.
+ * - Keeps the server tools simple—they only emit intents, never poke at state.
+ */
 import { nanoid } from "nanoid";
 
 import { useWorkflowGeneratorStore } from "../store";
@@ -12,6 +21,7 @@ import type {
 } from "./toolIntents";
 import type { WorkflowNode } from "../store/types";
 
+// Agent-created nodes still need unique IDs; this keeps them short and readable.
 const generateNodeId = () => Math.random().toString(36).slice(2, 6);
 
 const applyUpdateNodeLayer = (intent: UpdateNodeLayerIntent) => {
@@ -64,6 +74,7 @@ const applyAddNode = (intent: AddNodeIntent) => {
       position:
         intent.node.position ??
         {
+          // Auto-position new nodes in a staggered grid when coordinates aren’t supplied.
           x: state.nodes.length * 220 - 100,
           y: (state.nodes.length % 3) * 120,
         },
@@ -143,6 +154,7 @@ const applyConnectNodes = (intent: ConnectNodesIntent) => {
         edge.source === intent.sourceId && edge.target === intent.targetId
     );
     if (exists) {
+      // No-op when the connection already exists—avoids duplicate edges.
       return {};
     }
 
@@ -162,6 +174,7 @@ const applyRepositionNodes = (intent: RepositionNodesIntent) => {
     let nodes = state.nodes;
 
     if (intent.positions?.length) {
+      // Explicit coordinates win; map for O(1) lookups when mutating nodes.
       const positionMap = new Map(
         intent.positions.map(({ nodeId, position }) => [nodeId, position])
       );
@@ -178,16 +191,19 @@ const applyRepositionNodes = (intent: RepositionNodesIntent) => {
       const spacingY = 160;
 
       if (intent.layout === "horizontal") {
+        // Align nodes along the X axis; Y is reset to zero to create a lane.
         nodes = nodes.map((node, index) => ({
           ...node,
           position: { x: index * spacingX, y: 0 },
         }));
       } else if (intent.layout === "vertical") {
+        // Stack nodes vertically for step-by-step review.
         nodes = nodes.map((node, index) => ({
           ...node,
           position: { x: 0, y: index * spacingY },
         }));
       } else if (intent.layout === "grid") {
+        // Simple square grid: ceil(sqrt(n)) columns keeps rows balanced.
         const cols = Math.ceil(Math.sqrt(nodes.length)) || 1;
         nodes = nodes.map((node, index) => {
           const row = Math.floor(index / cols);
@@ -205,6 +221,7 @@ const applyRepositionNodes = (intent: RepositionNodesIntent) => {
 };
 
 const dispatchIntent = (intent: ToolIntent) => {
+  // Single dispatch ensures every new tool hooks into the same execution path.
   switch (intent.type) {
     case "updateNodeLayer":
       return applyUpdateNodeLayer(intent);

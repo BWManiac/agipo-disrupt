@@ -1,3 +1,14 @@
+/**
+ * Tool Intents
+ *
+ * Each server tool returns a `ToolResult` that contains an intent describing
+ * what should happen to the workflow. Keeping these TypeScript types in one
+ * place means:
+ * - Tools, agent route, and client dispatcher all agree on the payload shape.
+ * - Adding a new capability is as simple as defining the intent and wiring it
+ *   into `applyToolResult`.
+ * - We avoid circular imports between tools by centralising shared contracts.
+ */
 import type { ContractField } from "../store/types";
 
 export type UpdateNodeLayerIntent = {

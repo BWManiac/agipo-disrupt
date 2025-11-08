@@ -1,3 +1,10 @@
+/**
+ * connectNodesTool
+ *
+ * Creates directed edges between nodes. By keeping the schema small the
+ * assistant can chain calls (e.g. add node → connect nodes) without worrying
+ * about extra metadata.
+ */
 import { tool } from "ai";
 import { z } from "zod";
 

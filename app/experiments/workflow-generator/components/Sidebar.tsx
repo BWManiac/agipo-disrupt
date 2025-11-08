@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * Sidebar
+ * -------
+ * Shell component that renders the primary workflow tabs (console, state,
+ * context, editor).  The editor tab now routes through the new edge mapping
+ * stack when an edge is active, otherwise it falls back to the node editor.
+ */
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Edge } from "@xyflow/react";
 

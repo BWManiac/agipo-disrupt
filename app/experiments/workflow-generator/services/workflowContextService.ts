@@ -28,6 +28,7 @@ type SerializableEdge = {
   target: string;
 };
 
+// Keep code snippets short so prompts stay within context limits.
 const CODE_PREVIEW_LIMIT = 280;
 
 const trimCode = (code: string) => {
@@ -41,6 +42,7 @@ const serializeNode = (node: WorkflowGeneratorStore["nodes"][number]): Serializa
   id: node.id,
   title: node.data.title,
   position: {
+    // Round to two decimals to avoid meaningless float noise in the prompt.
     x: Math.round(node.position.x * 100) / 100,
     y: Math.round(node.position.y * 100) / 100,
   },

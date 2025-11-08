@@ -1,3 +1,13 @@
+/**
+ * Workflow slice
+ * --------------
+ * Owns the core React Flow graph plus all node/spec manipulation helpers.
+ *
+ * Highlights:
+ * - Seeds a two-node demo graph with business-friendly spec types (`text`).
+ * - Provides mutation helpers that the node + editor UIs call.
+ * - Stays free of UI knowledge so we can swap out components without touching state logic.
+ */
 import {
   addEdge,
   applyEdgeChanges,
@@ -17,6 +27,11 @@ import type {
 
 const generateNodeId = () => Math.random().toString(36).slice(2, 6);
 
+/**
+ * Starter graph showcasing a simple two-step pipeline.
+ * We keep the spec fields aligned with the `BusinessFieldType` vocabulary so
+ * everything in the UI + execution layers speaks the same language.
+ */
 const initialNodes: WorkflowNode[] = [
   {
     id: "1",

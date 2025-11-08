@@ -1,3 +1,11 @@
+/**
+ * addNodeTool
+ *
+ * Enables the agent to create new nodes with optional metadata and wiring.
+ * The schema mirrors what designers expect in the builder: title, code,
+ * spec contracts, and optional upstream/downstream connections so Gemini can
+ * drop a node into the graph in one request.
+ */
 import { tool } from "ai";
 import { z } from "zod";
 
@@ -6,6 +14,8 @@ import type { AddNodeIntent, ToolResult } from "./toolIntents";
 const BUSINESS_TYPES = ["text", "number", "flag", "list", "record", "file"] as const;
 const LIST_ITEM_TYPES = ["text", "number", "flag", "record", "file"] as const;
 
+// Mirrors the structure of `ContractField` but stays tool-local to avoid
+// cross-package imports and keep the schema minimal.
 const contractFieldSchema = z.object({
   name: z.string().min(1).describe("Field name"),
   type: z.enum(BUSINESS_TYPES).describe("Field type"),
@@ -70,6 +80,7 @@ export const addNodeTool = tool({
       .describe("Human-readable summary for the UI."),
   }),
   async execute(input): Promise<ToolResult> {
+    // Normalise missing defaults so downstream consumers don’t have to guard.
     const normalizeField = (field: z.infer<typeof contractFieldSchema>) => ({
       name: field.name,
       type: field.type,

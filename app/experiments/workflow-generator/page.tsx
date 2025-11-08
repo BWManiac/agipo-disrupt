@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * WorkflowGeneratorPage
+ * ---------------------
+ * Coordinates the React Flow canvas, sidebar tabs, webcontainer runtime, and
+ * edge-mapping UX.  The component mostly wires Zustand slices to presentation
+ * components—heavy lifting stays inside the store so we can test it in isolation.
+ */
 import "@xyflow/react/dist/style.css";
 
 import { useEffect, useMemo, useCallback } from "react";
@@ -78,6 +85,7 @@ export default function WorkflowGeneratorPage() {
   );
 
   useEffect(() => {
+    // Bootstrap the webcontainer on mount; tear it down when navigating away.
     bootRuntime();
     return () => {
       teardownRuntime();
@@ -88,6 +96,7 @@ export default function WorkflowGeneratorPage() {
 
   const handleOpenEditor = useCallback(
     (nodeId: string) => {
+      // Switching focus to a node should deactivate any active edge editor.
       setActiveEdge(null);
       openEditor(nodeId);
       setSidebarTab("editor");
@@ -193,10 +202,12 @@ export default function WorkflowGeneratorPage() {
   );
 
   const handleCanvasClick = useCallback(() => {
+    // Clicking empty canvas space should clear the edge selection.
     setActiveEdge(null);
   }, [setActiveEdge]);
 
   return (
+    // Layout: chat docked left, canvas centre, sidebar right.
     <div style={{ height: "100vh", width: "100vw", display: "flex" }}>
       <ChatPanel />
       <div style={{ flexGrow: 1, position: "relative" }}>

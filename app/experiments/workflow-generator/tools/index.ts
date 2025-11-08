@@ -1,3 +1,10 @@
+/**
+ * Tool Registry
+ *
+ * Consolidates every agent tool so both the API route and validation helpers
+ * can work with a single source of truth. New tools only need to be imported
+ * and registered here.
+ */
 import { addNodeTool } from "./addNode.tool";
 import { connectNodesTool } from "./connectNodes.tool";
 import { deleteNodeTool } from "./deleteNode.tool";

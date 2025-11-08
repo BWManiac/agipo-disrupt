@@ -1,5 +1,13 @@
 "use client";
 
+/**
+ * SpecFieldRow
+ * ------------
+ * Editable row inside the node spec editor.  Handles the business-friendly
+ * field vocabulary and ensures list fields expose a secondary selector for the
+ * per-item type.  This keeps the UX approachable for non-engineers without
+ * sacrificing strongly-typed state downstairs.
+ */
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import {
@@ -60,6 +68,7 @@ export function SpecFieldRow({
   onRemove,
 }: SpecFieldRowProps) {
   const handleTypeChange = (value: BusinessFieldType) => {
+    // When switching away from "list" we strip the `itemType` so downstream validation stays tidy.
     onChange({
       type: value,
       itemType: value === "list" ? itemType ?? "text" : undefined,
@@ -84,9 +93,12 @@ export function SpecFieldRow({
           <Label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
             Type
           </Label>
-          <Select value={type} onValueChange={(value) =>
-            handleTypeChange(value as BusinessFieldType)
-          }>
+          <Select
+            value={type}
+            onValueChange={(value) =>
+              handleTypeChange(value as BusinessFieldType)
+            }
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Pick a type" />
             </SelectTrigger>

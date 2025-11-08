@@ -1,3 +1,11 @@
+/**
+ * repositionNodesTool
+ *
+ * Gives the agent layout control. It supports two strategies:
+ * 1. Explicit coordinates per node.
+ * 2. Lightweight auto-layout hints (horizontal/vertical/grid) that the client
+ *    interprets into deterministic positions.
+ */
 import { tool } from "ai";
 import { z } from "zod";
 

@@ -1,5 +1,19 @@
 "use client";
 
+/**
+ * ChatPanel
+ *
+ * - Hosts the AI assistant inside the workflow generator’s left rail.
+ * - Supplies Gemini with serialized workflow state on every turn without showing
+ *   that payload in the UI. We do this by attaching the context to the transport
+ *   request and letting the API route prepend the system message server-side.
+ * - Renders tool invocations using the AI Elements components so designers and
+ *   developers can inspect inputs/outputs, and executes read-only client tools
+ *   such as `inspect_node` where the browser has the freshest Zustand state.
+ *
+ * This component aims to be “transport + rendering glue” while the server owns
+ * all agent orchestration.
+ */
 import {
   DefaultChatTransport,
   getToolName,
@@ -36,6 +50,11 @@ import { useWorkflowGeneratorStore } from "../store";
 import { serializeWorkflowContext } from "../services/workflowContextService";
 
 export function ChatPanel() {
+  /**
+   * Custom transport that always injects the latest workflow context into the
+   * outgoing request body. The server will translate this into a system message,
+   * keeping the UI transcripts clean and complying with Gemini’s ordering rules.
+   */
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
@@ -69,6 +88,8 @@ export function ChatPanel() {
   const { messages, sendMessage, status, addToolResult } = useChat({
     transport,
     onToolCall: async ({ toolCall }) => {
+      // Only `inspect_node` executes locally (read-only). All mutation tools
+      // route through the API because they run on the server via the agent.
       const toolName =
         (toolCall as { toolName?: string }).toolName ?? "";
 
@@ -139,6 +160,8 @@ export function ChatPanel() {
   const processedToolCallIds = useRef<Set<string>>(new Set());
 
   useEffect(() => {
+    // When tool responses arrive, convert their structured intent payloads into
+    // direct Zustand mutations so the canvas reflects agent decisions instantly.
     for (const message of messages) {
       for (const part of message.parts) {
         if (!isToolUIPart(part)) continue;
@@ -169,6 +192,10 @@ export function ChatPanel() {
   const isSending = status === "submitted" || status === "streaming";
   const isSubmitDisabled = isSending || input.trim() === "";
 
+  /**
+   * Render helper that streams tool cards and assistant/user text. System
+   * messages are filtered out earlier, so only visible text reaches end users.
+   */
   const renderMessageParts = (message: typeof messages[number]) =>
     message.parts.map((part, idx) => {
       if (isToolUIPart(part)) {

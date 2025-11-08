@@ -1,3 +1,11 @@
+/**
+ * updateNodeLayerTool
+ *
+ * Lets the agent revise a node’s code/spec/flow/title without replacing the
+ * entire object. Inputs are optional so Gemini can emit narrow updates (e.g.
+ * “just change the flow summary”) while we enforce full-array replacement for
+ * spec sub-sections to keep the store deterministic.
+ */
 import { tool } from "ai";
 import { z } from "zod";
 
@@ -54,6 +62,7 @@ export const updateNodeLayerTool = tool({
       .describe("Human-readable summary of the change for the UI."),
   }),
   async execute(input): Promise<ToolResult> {
+    // Ensure missing optional props become deterministic defaults.
     const normalizeField = (field: z.infer<typeof contractFieldSchema>) => ({
       name: field.name,
       type: field.type,

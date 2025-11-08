@@ -1,3 +1,16 @@
+/**
+ * IO Mapping slice
+ * ----------------
+ * Keeps track of edge-level bindings between outputs and inputs.  The slice is
+ * deliberately small—pure data manipulation with no React/DOM knowledge—so it
+ * can be reused by both the sidebar editor and the future execution wrapper.
+ *
+ * Responsibilities:
+ *  - Track which edge is currently selected (`activeEdgeId`).
+ *  - Add/remove/update bindings for a given edge.
+ *  - Provide lightweight validation (`MatchResult`) that callers can surface as warnings.
+ */
+
 import type { StateCreator } from "zustand";
 
 import type {
@@ -25,18 +38,22 @@ const typesCompatible = (
   from?: EdgeFieldRef,
   to?: EdgeFieldRef
 ): MatchResult => {
+  // Downstream missing -> the caller passed bad data; warn and bail.
   if (!to) {
     return { status: "warning", reason: "missing-downstream" };
   }
 
+  // Allow static/default values by returning a warning that UI can visualise.
   if (!from) {
     return { status: "warning", reason: "missing-upstream" };
   }
 
+  // Simple equality check keeps runtime cheap; coercion belongs in wrappers.
   if (from.type !== to.type) {
     return { status: "warning", reason: "type-mismatch" };
   }
 
+  // List fields carry a secondary item type which must also match.
   if (from.type === "list") {
     if (from.itemType !== to.itemType) {
       return { status: "warning", reason: "list-item-mismatch" };
@@ -62,6 +79,7 @@ export const createIoMappingSlice: StateCreator<
   },
 
   linkFields: (edgeId, from, to) => {
+    // Compute validation result prior to mutating state so callers can surface warnings.
     const result = typesCompatible(from, to);
     set((state) => {
       const current = state.mappings[edgeId] ?? {
@@ -93,6 +111,7 @@ export const createIoMappingSlice: StateCreator<
           ...state.mappings,
           [edgeId]: {
             ...current,
+            // attach new/updated link
             links: nextLinks,
           },
         },
@@ -153,6 +172,7 @@ export const createIoMappingSlice: StateCreator<
           ...state.mappings,
           [edgeId]: {
             ...current,
+            // we store static defaults as links with `from` undefined
             links: nextLinks,
           },
         },
@@ -165,6 +185,7 @@ export const createIoMappingSlice: StateCreator<
       if (!state.mappings[edgeId]) return state;
       const next = { ...state.mappings };
       delete next[edgeId];
+      // No need to reset activeEdgeId; UI handles deselection when appropriate.
       return { mappings: next };
     });
   },

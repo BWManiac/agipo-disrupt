@@ -1,3 +1,10 @@
+/**
+ * deleteNodeTool
+ *
+ * Simplest form of mutation: remove a node (and, via the dispatcher, any edges
+ * attached to it). Keeping the rationale/summary optional lets the agent leave
+ * breadcrumbs for the UI or audit logs later.
+ */
 import { tool } from "ai";
 import { z } from "zod";
 

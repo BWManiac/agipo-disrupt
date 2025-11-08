@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * EditorPanel
+ * -----------
+ * Smart wrapper that decides whether to render the node spec editor or the edge
+ * mapping table based on the current selection.  Keeps the sidebar component
+ * lean by hiding the branching logic here.
+ */
 import { NodeEditor } from "../editor/NodeEditor";
 import { EdgeEditorTable } from "../editor/data-mapping";
 import type { EdgeFieldRef, EdgeMapping } from "../../types/domain";
@@ -27,6 +34,7 @@ export function EditorPanel({
   onUnlink,
   onStaticValue,
 }: EditorPanelProps) {
+  // Priority: edge editor beats node editor when both an edge and node are selected.
   if (edgeId && targetNode) {
     return (
       <div className="h-full overflow-auto p-4">

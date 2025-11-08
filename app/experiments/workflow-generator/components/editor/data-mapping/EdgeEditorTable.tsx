@@ -1,5 +1,17 @@
 "use client";
 
+/**
+ * EdgeEditorTable
+ * ----------------
+ * Table-driven UI for managing mappings between a source node's outputs and a
+ * target node's inputs.  This mirrors the ShadCN table mock the PM approved and
+ * keeps the data entry flow compact enough for the sidebar.
+ *
+ * Responsibilities:
+ *  - Render one row per target input so nothing is hidden.
+ *  - Allow users to pick an upstream field or fall back to a static default.
+ *  - Surface validation warnings (type mismatches, missing bindings) inline.
+ */
 import {
   Table,
   TableBody,
@@ -17,7 +29,6 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { useMemo } from "react";
 
 import type {
   BusinessFieldType,
@@ -180,6 +191,7 @@ export function EdgeEditorTable({
                         (candidate) => candidate.fieldName === value
                       );
                       if (!source) return;
+                      // Delegate to store; validation happens in the slice.
                       onLink(
                         {
                           nodeId: source.nodeId,
