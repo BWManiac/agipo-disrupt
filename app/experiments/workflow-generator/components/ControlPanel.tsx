@@ -30,15 +30,24 @@ export function ControlPanel({
   onLayerChange,
 }: ControlPanelProps) {
   return (
-    <div className="absolute top-4 left-1/2 z-10 flex w-full max-w-4xl -translate-x-1/2 items-center justify-between rounded-2xl border border-slate-200 bg-background/90 px-6 py-4 shadow-lg backdrop-blur">
-      <Button onClick={onAdd} disabled={isBooting || isInstalling}>
+    <div className="pointer-events-none absolute top-4 left-1/2 z-10 flex w-full max-w-4xl -translate-x-1/2 items-center justify-between rounded-2xl border border-slate-200 bg-background/90 px-6 py-4 shadow-lg backdrop-blur">
+      {/* Re-enable pointer events on interactive children */}
+      <Button
+        onClick={onAdd}
+        disabled={isBooting || isInstalling}
+        className="pointer-events-auto"
+      >
         Add Node
       </Button>
-      <Button onClick={onRun} disabled={isBooting || isInstalling}>
+      <Button
+        onClick={onRun}
+        disabled={isBooting || isInstalling}
+        className="pointer-events-auto"
+      >
         {isBooting ? "Booting..." : "Run"}
       </Button>
       <Separator orientation="vertical" className="h-6" />
-      <div className="flex gap-2">
+      <div className="pointer-events-auto flex gap-2">
         <Input
           type="text"
           placeholder="npm package"
@@ -50,12 +59,13 @@ export function ControlPanel({
         <Button
           onClick={onInstall}
           disabled={isBooting || isInstalling || !packageName}
+          className="pointer-events-auto"
         >
           {isInstalling ? "Installing..." : "Install"}
         </Button>
       </div>
       <Separator orientation="vertical" className="h-6" />
-      <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white p-1">
+      <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-slate-200 bg-white p-1">
         {(["flow", "spec", "code"] as WorkflowLayer[]).map((layer) => {
           const isActive = activeLayer === layer;
           return (

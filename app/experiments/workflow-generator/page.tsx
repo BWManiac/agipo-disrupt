@@ -8,6 +8,7 @@ import { Background, Controls, ReactFlow } from "@xyflow/react";
 import { ControlPanel } from "./components/ControlPanel";
 import { CodeNode } from "./components/CodeNode";
 import { Sidebar } from "./components/Sidebar";
+import { ChatPanel } from "./components/ChatPanel";
 import { useWorkflowGeneratorStore } from "./store";
 
 export default function WorkflowGeneratorPage() {
@@ -18,6 +19,9 @@ export default function WorkflowGeneratorPage() {
   const isBooting = useWorkflowGeneratorStore((state) => state.isBooting);
   const isInstalling = useWorkflowGeneratorStore((state) => state.isInstalling);
   const activeLayer = useWorkflowGeneratorStore((state) => state.activeLayer);
+  const activeSidebarTab = useWorkflowGeneratorStore(
+    (state) => state.activeSidebarTab
+  );
 
   const onNodesChange = useWorkflowGeneratorStore((state) => state.onNodesChange);
   const onEdgesChange = useWorkflowGeneratorStore((state) => state.onEdgesChange);
@@ -32,33 +36,6 @@ export default function WorkflowGeneratorPage() {
   const updateNodeTitle = useWorkflowGeneratorStore(
     (state) => state.updateNodeTitle
   );
-  const addNodeSpecInput = useWorkflowGeneratorStore(
-    (state) => state.addNodeSpecInput
-  );
-  const updateNodeSpecInput = useWorkflowGeneratorStore(
-    (state) => state.updateNodeSpecInput
-  );
-  const removeNodeSpecInput = useWorkflowGeneratorStore(
-    (state) => state.removeNodeSpecInput
-  );
-  const addNodeSpecOutput = useWorkflowGeneratorStore(
-    (state) => state.addNodeSpecOutput
-  );
-  const updateNodeSpecOutput = useWorkflowGeneratorStore(
-    (state) => state.updateNodeSpecOutput
-  );
-  const removeNodeSpecOutput = useWorkflowGeneratorStore(
-    (state) => state.removeNodeSpecOutput
-  );
-  const addNodeProcessStep = useWorkflowGeneratorStore(
-    (state) => state.addNodeProcessStep
-  );
-  const updateNodeProcessStep = useWorkflowGeneratorStore(
-    (state) => state.updateNodeProcessStep
-  );
-  const removeNodeProcessStep = useWorkflowGeneratorStore(
-    (state) => state.removeNodeProcessStep
-  );
 
   const installDependency = useWorkflowGeneratorStore(
     (state) => state.installDependency
@@ -69,6 +46,13 @@ export default function WorkflowGeneratorPage() {
   );
   const setActiveLayer = useWorkflowGeneratorStore(
     (state) => state.setActiveLayer
+  );
+  const setSidebarTab = useWorkflowGeneratorStore(
+    (state) => state.setSidebarTab
+  );
+  const openEditor = useWorkflowGeneratorStore((state) => state.openEditor);
+  const editingNodeId = useWorkflowGeneratorStore(
+    (state) => state.editingNodeId
   );
   const bootRuntime = useWorkflowGeneratorStore((state) => state.bootRuntime);
   const teardownRuntime = useWorkflowGeneratorStore(
@@ -88,20 +72,13 @@ export default function WorkflowGeneratorPage() {
     () =>
       nodes.map((node) => ({
         ...node,
+        selected: node.id === editingNodeId,
         data: {
           ...node.data,
           onChange: updateNodeCode,
           onFlowChange: updateNodeFlowSummary,
           onTitleChange: updateNodeTitle,
-          onSpecInputAdd: addNodeSpecInput,
-          onSpecInputChange: updateNodeSpecInput,
-          onSpecInputRemove: removeNodeSpecInput,
-          onSpecOutputAdd: addNodeSpecOutput,
-          onSpecOutputChange: updateNodeSpecOutput,
-          onSpecOutputRemove: removeNodeSpecOutput,
-          onProcessStepAdd: addNodeProcessStep,
-          onProcessStepChange: updateNodeProcessStep,
-          onProcessStepRemove: removeNodeProcessStep,
+          onOpenEditor: openEditor,
           activeLayer,
         },
       })),
@@ -110,15 +87,8 @@ export default function WorkflowGeneratorPage() {
       updateNodeCode,
       updateNodeFlowSummary,
       updateNodeTitle,
-      addNodeSpecInput,
-      updateNodeSpecInput,
-      removeNodeSpecInput,
-      addNodeSpecOutput,
-      updateNodeSpecOutput,
-      removeNodeSpecOutput,
-      addNodeProcessStep,
-      updateNodeProcessStep,
-      removeNodeProcessStep,
+      openEditor,
+      editingNodeId,
       activeLayer,
     ]
   );
@@ -134,8 +104,14 @@ export default function WorkflowGeneratorPage() {
     [nodes]
   );
 
+  const editingNode = useMemo(
+    () => nodes.find((node) => node.id === editingNodeId) ?? null,
+    [nodes, editingNodeId]
+  );
+
   return (
     <div style={{ height: "100vh", width: "100vw", display: "flex" }}>
+      <ChatPanel />
       <div style={{ flexGrow: 1, position: "relative" }}>
         <ControlPanel
           onAdd={addNode}
@@ -166,6 +142,9 @@ export default function WorkflowGeneratorPage() {
         output={output}
         activeLayer={activeLayer}
         contracts={contracts}
+        activeTab={activeSidebarTab}
+        onTabChange={setSidebarTab}
+        editingNode={editingNode}
       />
     </div>
   );

@@ -98,7 +98,23 @@ export type WebcontainerSliceActions = {
 
 export type WebcontainerSlice = WebcontainerSliceState & WebcontainerSliceActions;
 
+export type SidebarTab = "console" | "state" | "context" | "editor";
+
+export type EditorUiSliceState = {
+  activeSidebarTab: SidebarTab;
+  editingNodeId: string | null;
+};
+
+export type EditorUiSliceActions = {
+  setSidebarTab: (tab: SidebarTab) => void;
+  openEditor: (nodeId: string) => void;
+  clearEditor: () => void;
+};
+
+export type EditorUiSlice = EditorUiSliceState & EditorUiSliceActions;
+
 export type WorkflowGeneratorStore = WorkflowSlice &
   ExecutionSlice &
-  WebcontainerSlice;
+  WebcontainerSlice &
+  EditorUiSlice;
 

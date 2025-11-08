@@ -21,7 +21,7 @@ const initialNodes: WorkflowNode[] = [
   {
     id: "1",
     type: "code",
-    position: { x: -100, y: 0 },
+    position: { x: -100, y: 200 },
     data: {
       id: "1",
       title: "Collect Input",
@@ -58,7 +58,7 @@ process.stdout.write("Data flows like a river!");`,
   {
     id: "2",
     type: "code",
-    position: { x: 200, y: 0 },
+    position: { x: 200, y: 200 },
     data: {
       id: "2",
       title: "Format Message",

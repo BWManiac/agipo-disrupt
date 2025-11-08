@@ -1,11 +1,14 @@
 "use client";
 
+import { type ReactElement } from "react";
+
 import { Handle, Position } from "@xyflow/react";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 
-import type { ContractField, WorkflowNodeData } from "../store/types";
+import type { WorkflowNodeData } from "../store/types";
 import { CodeContent } from "./code-node/CodeContent";
 import { FlowContent } from "./code-node/FlowContent";
 import { SpecContent } from "./code-node/SpecContent";
@@ -14,37 +17,52 @@ type CodeNodeData = WorkflowNodeData & {
   onChange: (id: string, code: string) => void;
   onFlowChange: (id: string, summary: string) => void;
   onTitleChange: (id: string, title: string) => void;
-  onSpecInputAdd: (id: string) => void;
-  onSpecInputChange: (
-    id: string,
-    index: number,
-    patch: Partial<ContractField>
-  ) => void;
-  onSpecInputRemove: (id: string, index: number) => void;
-  onSpecOutputAdd: (id: string) => void;
-  onSpecOutputChange: (
-    id: string,
-    index: number,
-    patch: Partial<ContractField>
-  ) => void;
-  onSpecOutputRemove: (id: string, index: number) => void;
-  onProcessStepAdd: (id: string) => void;
-  onProcessStepChange: (id: string, index: number, value: string) => void;
-  onProcessStepRemove: (id: string, index: number) => void;
+  onOpenEditor: (id: string) => void;
   activeLayer: "flow" | "spec" | "code";
 };
 
-export function CodeNode({ data }: { data: CodeNodeData }) {
+export function CodeNode({
+  data,
+  selected,
+}: {
+  data: CodeNodeData;
+  selected?: boolean;
+}): ReactElement {
   return (
     <Card
+      onDoubleClick={(event) => {
+        if (
+          event.target instanceof HTMLElement &&
+          ["INPUT", "TEXTAREA", "BUTTON"].includes(event.target.tagName)
+        ) {
+          return;
+        }
+        data.onOpenEditor(data.id);
+      }}
       style={{
         width: 360,
-        borderWidth: data.isRunning ? "2px" : "1px",
-        borderColor: data.isRunning ? "hsl(var(--primary))" : undefined,
+        borderWidth: data.isRunning || selected ? "2px" : "1px",
+        borderColor: data.isRunning
+          ? "hsl(var(--primary))"
+          : selected
+          ? "hsl(var(--primary) / 0.6)"
+          : undefined,
       }}
     >
       <Handle type="target" position={Position.Top} />
-      <CardHeader>
+      <CardHeader className="relative">
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          className="absolute right-0 top-0 translate-x-1/2 -translate-y-1/2 rounded-full"
+          onClick={(event) => {
+            event.stopPropagation();
+            data.onOpenEditor(data.id);
+          }}
+        >
+          Edit
+        </Button>
         <CardTitle>
           <EditableTitle
             title={data.title || `Node ${data.id}`}
@@ -62,26 +80,7 @@ export function CodeNode({ data }: { data: CodeNodeData }) {
       <CardContent className="space-y-3">
         {data.activeLayer === "flow" && <FlowContent data={data} />}
         {data.activeLayer === "spec" && (
-          <SpecContent
-            data={data}
-            onInputAdd={() => data.onSpecInputAdd(data.id)}
-            onInputChange={(index, patch) =>
-              data.onSpecInputChange(data.id, index, patch)
-            }
-            onInputRemove={(index) => data.onSpecInputRemove(data.id, index)}
-            onOutputAdd={() => data.onSpecOutputAdd(data.id)}
-            onOutputChange={(index, patch) =>
-              data.onSpecOutputChange(data.id, index, patch)
-            }
-            onOutputRemove={(index) => data.onSpecOutputRemove(data.id, index)}
-            onProcessAdd={() => data.onProcessStepAdd(data.id)}
-            onProcessChange={(index, value) =>
-              data.onProcessStepChange(data.id, index, value)
-            }
-            onProcessRemove={(index) =>
-              data.onProcessStepRemove(data.id, index)
-            }
-          />
+          <SpecContent data={data} onOpenEditor={() => data.onOpenEditor(data.id)} />
         )}
         {data.activeLayer === "code" && (
           <div className="space-y-1">

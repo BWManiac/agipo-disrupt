@@ -1,140 +1,59 @@
 "use client";
 
-import { Plus } from "lucide-react";
-
-import type { ContractField, WorkflowNodeData } from "../../store/types";
-import { ProcessStepItem } from "./spec/ProcessStepItem";
-import { SectionHeader } from "./spec/SectionHeader";
-import { SpecFieldRow } from "./spec/SpecFieldRow";
+import type { WorkflowNodeData } from "../../store/types";
 
 type SpecContentProps = {
   data: WorkflowNodeData;
-  onInputAdd: () => void;
-  onInputChange: (index: number, patch: Partial<ContractField>) => void;
-  onInputRemove: (index: number) => void;
-  onOutputAdd: () => void;
-  onOutputChange: (index: number, patch: Partial<ContractField>) => void;
-  onOutputRemove: (index: number) => void;
-  onProcessAdd: () => void;
-  onProcessChange: (index: number, value: string) => void;
-  onProcessRemove: (index: number) => void;
+  onOpenEditor: () => void;
 };
 
-export function SpecContent({
-  data,
-  onInputAdd,
-  onInputChange,
-  onInputRemove,
-  onOutputAdd,
-  onOutputChange,
-  onOutputRemove,
-  onProcessAdd,
-  onProcessChange,
-  onProcessRemove,
-}: SpecContentProps) {
+export function SpecContent({ data, onOpenEditor }: SpecContentProps) {
+  const inputsSummary =
+    data.spec.inputs.length === 0
+      ? "No inputs"
+      : data.spec.inputs
+          .slice(0, 2)
+          .map((input) => input.name || "(unnamed)")
+          .join(", ") + (data.spec.inputs.length > 2 ? "…" : "");
+
+  const outputsSummary =
+    data.spec.outputs.length === 0
+      ? "No outputs"
+      : data.spec.outputs
+          .slice(0, 2)
+          .map((output) => output.name || "(unnamed)")
+          .join(", ") + (data.spec.outputs.length > 2 ? "…" : "");
+
+  const processSummary =
+    data.spec.process.length === 0
+      ? "No documented steps."
+      : data.spec.process[0] +
+        (data.spec.process.length > 1 ? " (+" + (data.spec.process.length - 1) + " more)" : "");
+
   return (
-    <div className="space-y-5 text-sm text-slate-600">
-      <section className="space-y-3">
-        <SectionHeader
-          title="Input"
-          subtitle="Describe required values."
-        />
-        <div className="space-y-3">
-          {data.spec.inputs.length === 0 ? (
-            <p className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 p-3 text-xs text-slate-400">
-              No inputs defined yet.
-            </p>
-          ) : (
-            data.spec.inputs.map((input, index) => (
-              <SpecFieldRow
-                key={index}
-                label={`Field ${index + 1}`}
-                name={input.name}
-                type={input.type}
-                description={input.description}
-                optional={input.optional}
-                onChange={(patch) => onInputChange(index, patch)}
-                onRemove={() => onInputRemove(index)}
-              />
-            ))
-          )}
-          <AddButton label="Add input" onClick={onInputAdd} />
-        </div>
-      </section>
-
-      <section className="space-y-3">
-        <SectionHeader
-          title="Process"
-          subtitle="Explain how this node transforms inputs."
-        />
-        <div className="space-y-3">
-          {data.spec.process.length === 0 ? (
-            <p className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 p-3 text-xs text-slate-400">
-              Document the steps.
-            </p>
-          ) : (
-            data.spec.process.map((step, index) => (
-              <ProcessStepItem
-                key={index}
-                index={index}
-                value={step}
-                onChange={(value) => onProcessChange(index, value)}
-                onRemove={() => onProcessRemove(index)}
-              />
-            ))
-          )}
-          <AddButton label="Add step" onClick={onProcessAdd} />
-        </div>
-      </section>
-
-      <section className="space-y-3">
-        <SectionHeader
-          title="Output"
-          subtitle="List what will be emitted."
-        />
-        <div className="space-y-3">
-          {data.spec.outputs.length === 0 ? (
-            <p className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 p-3 text-xs text-slate-400">
-              No outputs defined yet.
-            </p>
-          ) : (
-            data.spec.outputs.map((output, index) => (
-              <SpecFieldRow
-                key={index}
-                label={`Field ${index + 1}`}
-                name={output.name}
-                type={output.type}
-                description={output.description}
-                optional={output.optional}
-                onChange={(patch) => onOutputChange(index, patch)}
-                onRemove={() => onOutputRemove(index)}
-              />
-            ))
-          )}
-          <AddButton label="Add output" onClick={onOutputAdd} />
-        </div>
-      </section>
+    <div className="space-y-4 text-sm text-slate-600">
+      <SummaryCard title="Inputs" value={inputsSummary} />
+      <SummaryCard title="Process" value={processSummary} />
+      <SummaryCard title="Outputs" value={outputsSummary} />
+      <button
+        type="button"
+        onClick={onOpenEditor}
+        className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
+        onPointerDownCapture={(event) => event.stopPropagation()}
+      >
+        Edit details
+      </button>
     </div>
   );
 }
 
-function AddButton({
-  label,
-  onClick,
-}: {
-  label: string;
-  onClick: () => void;
-}) {
+function SummaryCard({ title, value }: { title: string; value: string }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
-      onPointerDownCapture={(event) => event.stopPropagation()}
-    >
-      <Plus className="h-4 w-4" />
-      {label}
-    </button>
+    <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3">
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+        {title}
+      </p>
+      <p className="mt-1 text-sm text-slate-600">{value}</p>
+    </div>
   );
 }
-
