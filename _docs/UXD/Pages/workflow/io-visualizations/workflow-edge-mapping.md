@@ -59,7 +59,7 @@ type MatchResult =
         | "list-item-mismatch"
         | "missing-upstream"
         | "missing-downstream";
-    };
+};
 
 type EdgeIoSliceActions = {
   setActiveEdge(edgeId: string | null): void;

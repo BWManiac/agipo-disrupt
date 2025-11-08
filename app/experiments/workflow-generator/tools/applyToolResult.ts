@@ -8,6 +8,7 @@ import type {
   AddNodeIntent,
   DeleteNodeIntent,
   ConnectNodesIntent,
+  RepositionNodesIntent,
 } from "./toolIntents";
 import type { WorkflowNode } from "../store/types";
 
@@ -156,6 +157,53 @@ const applyConnectNodes = (intent: ConnectNodesIntent) => {
   });
 };
 
+const applyRepositionNodes = (intent: RepositionNodesIntent) => {
+  useWorkflowGeneratorStore.setState((state) => {
+    let nodes = state.nodes;
+
+    if (intent.positions?.length) {
+      const positionMap = new Map(
+        intent.positions.map(({ nodeId, position }) => [nodeId, position])
+      );
+      nodes = nodes.map((node) =>
+        positionMap.has(node.id)
+          ? {
+              ...node,
+              position: positionMap.get(node.id)!,
+            }
+          : node
+      );
+    } else if (intent.layout) {
+      const spacingX = 220;
+      const spacingY = 160;
+
+      if (intent.layout === "horizontal") {
+        nodes = nodes.map((node, index) => ({
+          ...node,
+          position: { x: index * spacingX, y: 0 },
+        }));
+      } else if (intent.layout === "vertical") {
+        nodes = nodes.map((node, index) => ({
+          ...node,
+          position: { x: 0, y: index * spacingY },
+        }));
+      } else if (intent.layout === "grid") {
+        const cols = Math.ceil(Math.sqrt(nodes.length)) || 1;
+        nodes = nodes.map((node, index) => {
+          const row = Math.floor(index / cols);
+          const col = index % cols;
+          return {
+            ...node,
+            position: { x: col * spacingX, y: row * spacingY },
+          };
+        });
+      }
+    }
+
+    return { nodes };
+  });
+};
+
 const dispatchIntent = (intent: ToolIntent) => {
   switch (intent.type) {
     case "updateNodeLayer":
@@ -166,6 +214,8 @@ const dispatchIntent = (intent: ToolIntent) => {
       return applyDeleteNode(intent);
     case "connectNodes":
       return applyConnectNodes(intent);
+    case "repositionNodes":
+      return applyRepositionNodes(intent);
     default:
       return;
   }

@@ -49,11 +49,26 @@ export type ConnectNodesIntent = {
   rationale?: string;
 };
 
+export type RepositionNodesIntent = {
+  type: "repositionNodes";
+  positions?: Array<{
+    nodeId: string;
+    position: { x: number; y: number };
+  }>;
+  layout?:
+    | "horizontal"
+    | "vertical"
+    | "grid";
+  rationale?: string;
+  summary?: string;
+};
+
 export type ToolIntent =
   | UpdateNodeLayerIntent
   | AddNodeIntent
   | DeleteNodeIntent
-  | ConnectNodesIntent;
+  | ConnectNodesIntent
+  | RepositionNodesIntent;
 
 export type ToolResult = {
   intent: ToolIntent;
