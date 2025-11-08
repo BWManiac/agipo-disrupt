@@ -29,6 +29,36 @@ export default function WorkflowGeneratorPage() {
   const updateNodeFlowSummary = useWorkflowGeneratorStore(
     (state) => state.updateNodeFlowSummary
   );
+  const updateNodeTitle = useWorkflowGeneratorStore(
+    (state) => state.updateNodeTitle
+  );
+  const addNodeSpecInput = useWorkflowGeneratorStore(
+    (state) => state.addNodeSpecInput
+  );
+  const updateNodeSpecInput = useWorkflowGeneratorStore(
+    (state) => state.updateNodeSpecInput
+  );
+  const removeNodeSpecInput = useWorkflowGeneratorStore(
+    (state) => state.removeNodeSpecInput
+  );
+  const addNodeSpecOutput = useWorkflowGeneratorStore(
+    (state) => state.addNodeSpecOutput
+  );
+  const updateNodeSpecOutput = useWorkflowGeneratorStore(
+    (state) => state.updateNodeSpecOutput
+  );
+  const removeNodeSpecOutput = useWorkflowGeneratorStore(
+    (state) => state.removeNodeSpecOutput
+  );
+  const addNodeProcessStep = useWorkflowGeneratorStore(
+    (state) => state.addNodeProcessStep
+  );
+  const updateNodeProcessStep = useWorkflowGeneratorStore(
+    (state) => state.updateNodeProcessStep
+  );
+  const removeNodeProcessStep = useWorkflowGeneratorStore(
+    (state) => state.removeNodeProcessStep
+  );
 
   const installDependency = useWorkflowGeneratorStore(
     (state) => state.installDependency
@@ -62,10 +92,35 @@ export default function WorkflowGeneratorPage() {
           ...node.data,
           onChange: updateNodeCode,
           onFlowChange: updateNodeFlowSummary,
+          onTitleChange: updateNodeTitle,
+          onSpecInputAdd: addNodeSpecInput,
+          onSpecInputChange: updateNodeSpecInput,
+          onSpecInputRemove: removeNodeSpecInput,
+          onSpecOutputAdd: addNodeSpecOutput,
+          onSpecOutputChange: updateNodeSpecOutput,
+          onSpecOutputRemove: removeNodeSpecOutput,
+          onProcessStepAdd: addNodeProcessStep,
+          onProcessStepChange: updateNodeProcessStep,
+          onProcessStepRemove: removeNodeProcessStep,
           activeLayer,
         },
       })),
-    [nodes, updateNodeCode, updateNodeFlowSummary, activeLayer]
+    [
+      nodes,
+      updateNodeCode,
+      updateNodeFlowSummary,
+      updateNodeTitle,
+      addNodeSpecInput,
+      updateNodeSpecInput,
+      removeNodeSpecInput,
+      addNodeSpecOutput,
+      updateNodeSpecOutput,
+      removeNodeSpecOutput,
+      addNodeProcessStep,
+      updateNodeProcessStep,
+      removeNodeProcessStep,
+      activeLayer,
+    ]
   );
 
   const contracts = useMemo(

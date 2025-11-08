@@ -47,6 +47,24 @@ export type WorkflowSliceActions = {
   updateNodeFlowSummary: (nodeId: string, summary: string) => void;
   markNodesRunning: (nodeIds: string[], isRunning: boolean) => void;
   setActiveLayer: (layer: WorkflowLayer) => void;
+  updateNodeTitle: (nodeId: string, title: string) => void;
+  addNodeSpecInput: (nodeId: string) => void;
+  updateNodeSpecInput: (
+    nodeId: string,
+    index: number,
+    patch: Partial<ContractField>
+  ) => void;
+  removeNodeSpecInput: (nodeId: string, index: number) => void;
+  addNodeSpecOutput: (nodeId: string) => void;
+  updateNodeSpecOutput: (
+    nodeId: string,
+    index: number,
+    patch: Partial<ContractField>
+  ) => void;
+  removeNodeSpecOutput: (nodeId: string, index: number) => void;
+  addNodeProcessStep: (nodeId: string) => void;
+  updateNodeProcessStep: (nodeId: string, index: number, value: string) => void;
+  removeNodeProcessStep: (nodeId: string, index: number) => void;
 };
 
 export type WorkflowSlice = WorkflowSliceState & WorkflowSliceActions;
