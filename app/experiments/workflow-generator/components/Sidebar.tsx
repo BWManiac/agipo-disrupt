@@ -8,6 +8,7 @@ import type {
   WorkflowLayer,
   WorkflowNode,
 } from "../store/types";
+import type { EdgeFieldRef, EdgeMapping, MatchResult } from "../types/domain";
 import { ConsolePanel } from "./sidebar/ConsolePanel";
 import { ContextPanel } from "./sidebar/ContextPanel";
 import { EditorPanel } from "./sidebar/EditorPanel";
@@ -27,6 +28,13 @@ type SidebarProps = {
   activeTab: SidebarTab;
   onTabChange: (tab: SidebarTab) => void;
   editingNode: WorkflowNode | null;
+  activeEdgeId: string | null;
+  edgeSourceNode: WorkflowNode | null;
+  edgeTargetNode: WorkflowNode | null;
+  edgeMapping?: EdgeMapping;
+  onLinkEdge: (from: EdgeFieldRef | undefined, to: EdgeFieldRef) => MatchResult;
+  onUnlinkEdge: (to: EdgeFieldRef) => void;
+  onSetStaticValue: (to: EdgeFieldRef, value: string) => void;
 };
 
 export function Sidebar({
@@ -38,6 +46,13 @@ export function Sidebar({
   activeTab,
   onTabChange,
   editingNode,
+  activeEdgeId,
+  edgeSourceNode,
+  edgeTargetNode,
+  edgeMapping,
+  onLinkEdge,
+  onUnlinkEdge,
+  onSetStaticValue,
 }: SidebarProps) {
   return (
     <div className="w-[400px] border-l bg-background">
@@ -62,7 +77,16 @@ export function Sidebar({
           <ContextPanel activeLayer={activeLayer} contracts={contracts} />
         </TabsContent>
         <TabsContent value="editor" className="flex-grow">
-          <EditorPanel node={editingNode} />
+          <EditorPanel
+            node={editingNode}
+            edgeId={activeEdgeId}
+            sourceNode={edgeSourceNode}
+            targetNode={edgeTargetNode}
+            mapping={edgeMapping}
+            onLink={onLinkEdge}
+            onUnlink={onUnlinkEdge}
+            onStaticValue={onSetStaticValue}
+          />
         </TabsContent>
       </Tabs>
     </div>

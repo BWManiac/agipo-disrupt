@@ -2,14 +2,20 @@
 
 import "@xyflow/react/dist/style.css";
 
-import { useEffect, useMemo } from "react";
-import { Background, Controls, ReactFlow } from "@xyflow/react";
+import { useEffect, useMemo, useCallback } from "react";
+import {
+  Background,
+  Controls,
+  ReactFlow,
+  type EdgeMouseHandler,
+} from "@xyflow/react";
 
 import { ControlPanel } from "./components/ControlPanel";
 import { CodeNode } from "./components/CodeNode";
 import { Sidebar } from "./components/Sidebar";
 import { ChatPanel } from "./components/ChatPanel";
 import { useWorkflowGeneratorStore } from "./store";
+import type { MatchResult, EdgeFieldRef } from "./types/domain";
 
 export default function WorkflowGeneratorPage() {
   const nodes = useWorkflowGeneratorStore((state) => state.nodes);
@@ -54,6 +60,18 @@ export default function WorkflowGeneratorPage() {
   const editingNodeId = useWorkflowGeneratorStore(
     (state) => state.editingNodeId
   );
+  const activeEdgeId = useWorkflowGeneratorStore(
+    (state) => state.activeEdgeId
+  );
+  const mappings = useWorkflowGeneratorStore((state) => state.mappings);
+  const setActiveEdge = useWorkflowGeneratorStore(
+    (state) => state.setActiveEdge
+  );
+  const linkFields = useWorkflowGeneratorStore((state) => state.linkFields);
+  const unlinkField = useWorkflowGeneratorStore((state) => state.unlinkField);
+  const setStaticValue = useWorkflowGeneratorStore(
+    (state) => state.setStaticValue
+  );
   const bootRuntime = useWorkflowGeneratorStore((state) => state.bootRuntime);
   const teardownRuntime = useWorkflowGeneratorStore(
     (state) => state.teardownRuntime
@@ -68,6 +86,15 @@ export default function WorkflowGeneratorPage() {
 
   const nodeTypes = useMemo(() => ({ code: CodeNode }), []);
 
+  const handleOpenEditor = useCallback(
+    (nodeId: string) => {
+      setActiveEdge(null);
+      openEditor(nodeId);
+      setSidebarTab("editor");
+    },
+    [openEditor, setActiveEdge, setSidebarTab]
+  );
+
   const augmentedNodes = useMemo(
     () =>
       nodes.map((node) => ({
@@ -78,7 +105,7 @@ export default function WorkflowGeneratorPage() {
           onChange: updateNodeCode,
           onFlowChange: updateNodeFlowSummary,
           onTitleChange: updateNodeTitle,
-          onOpenEditor: openEditor,
+          onOpenEditor: handleOpenEditor,
           activeLayer,
         },
       })),
@@ -87,7 +114,7 @@ export default function WorkflowGeneratorPage() {
       updateNodeCode,
       updateNodeFlowSummary,
       updateNodeTitle,
-      openEditor,
+      handleOpenEditor,
       editingNodeId,
       activeLayer,
     ]
@@ -108,6 +135,66 @@ export default function WorkflowGeneratorPage() {
     () => nodes.find((node) => node.id === editingNodeId) ?? null,
     [nodes, editingNodeId]
   );
+
+  const activeEdge = useMemo(
+    () => edges.find((edge) => edge.id === activeEdgeId) ?? null,
+    [edges, activeEdgeId]
+  );
+
+  const edgeSourceNode = useMemo(
+    () =>
+      activeEdge ? nodes.find((node) => node.id === activeEdge.source) ?? null : null,
+    [activeEdge, nodes]
+  );
+
+  const edgeTargetNode = useMemo(
+    () =>
+      activeEdge ? nodes.find((node) => node.id === activeEdge.target) ?? null : null,
+    [activeEdge, nodes]
+  );
+
+  const edgeMapping = activeEdgeId ? mappings[activeEdgeId] : undefined;
+
+  const handleEdgeClick: EdgeMouseHandler = useCallback(
+    (_event, edge) => {
+      setSidebarTab("editor");
+      setActiveEdge(edge.id);
+    },
+    [setActiveEdge, setSidebarTab]
+  );
+
+  const handleLinkEdge = useCallback(
+    (from: EdgeFieldRef | undefined, to: EdgeFieldRef) => {
+      if (!activeEdgeId) {
+        return {
+          status: "warning",
+          reason: "missing-downstream",
+        } as MatchResult;
+      }
+      return linkFields(activeEdgeId, from, to);
+    },
+    [activeEdgeId, linkFields]
+  );
+
+  const handleUnlinkEdge = useCallback(
+    (to: EdgeFieldRef) => {
+      if (!activeEdgeId) return;
+      unlinkField(activeEdgeId, to);
+    },
+    [activeEdgeId, unlinkField]
+  );
+
+  const handleStaticValue = useCallback(
+    (to: EdgeFieldRef, value: string) => {
+      if (!activeEdgeId) return;
+      setStaticValue(activeEdgeId, to, value);
+    },
+    [activeEdgeId, setStaticValue]
+  );
+
+  const handleCanvasClick = useCallback(() => {
+    setActiveEdge(null);
+  }, [setActiveEdge]);
 
   return (
     <div style={{ height: "100vh", width: "100vw", display: "flex" }}>
@@ -130,6 +217,8 @@ export default function WorkflowGeneratorPage() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
+          onEdgeClick={handleEdgeClick}
+          onPaneClick={handleCanvasClick}
           nodeTypes={nodeTypes}
         >
           <Controls />
@@ -145,6 +234,13 @@ export default function WorkflowGeneratorPage() {
         activeTab={activeSidebarTab}
         onTabChange={setSidebarTab}
         editingNode={editingNode}
+        activeEdgeId={activeEdgeId}
+        edgeSourceNode={edgeSourceNode}
+        edgeTargetNode={edgeTargetNode}
+        edgeMapping={edgeMapping}
+        onLinkEdge={handleLinkEdge}
+        onUnlinkEdge={handleUnlinkEdge}
+        onSetStaticValue={handleStaticValue}
       />
     </div>
   );

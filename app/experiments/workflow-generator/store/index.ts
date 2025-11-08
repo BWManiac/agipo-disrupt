@@ -5,6 +5,7 @@ import { createWebcontainerSlice } from "./webcontainerSlice";
 import { createWorkflowSlice } from "./workflowSlice";
 import type { WorkflowGeneratorStore } from "./types";
 import { createEditorSlice } from "./ui/editorSlice";
+import { createIoMappingSlice } from "./ioMappingSlice";
 
 export const useWorkflowGeneratorStore = create<WorkflowGeneratorStore>()(
   (...args) => ({
@@ -12,6 +13,7 @@ export const useWorkflowGeneratorStore = create<WorkflowGeneratorStore>()(
     ...createExecutionSlice(...args),
     ...createWebcontainerSlice(...args),
     ...createEditorSlice(...args),
+    ...createIoMappingSlice(...args),
   })
 );
 

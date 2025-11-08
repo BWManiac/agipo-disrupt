@@ -3,9 +3,13 @@ import { z } from "zod";
 
 import type { AddNodeIntent, ToolResult } from "./toolIntents";
 
+const BUSINESS_TYPES = ["text", "number", "flag", "list", "record", "file"] as const;
+const LIST_ITEM_TYPES = ["text", "number", "flag", "record", "file"] as const;
+
 const contractFieldSchema = z.object({
   name: z.string().min(1).describe("Field name"),
-  type: z.string().min(1).describe("Field type"),
+  type: z.enum(BUSINESS_TYPES).describe("Field type"),
+  itemType: z.enum(LIST_ITEM_TYPES).optional(),
   description: z.string().optional(),
   optional: z.boolean().optional(),
 });
@@ -66,13 +70,27 @@ export const addNodeTool = tool({
       .describe("Human-readable summary for the UI."),
   }),
   async execute(input): Promise<ToolResult> {
+    const normalizeField = (field: z.infer<typeof contractFieldSchema>) => ({
+      name: field.name,
+      type: field.type,
+      itemType: field.type === "list" ? field.itemType ?? "text" : undefined,
+      description: field.description ?? "",
+      optional: field.optional ?? false,
+    });
+
     const intent: AddNodeIntent = {
       type: "addNode",
       node: {
         title: input.title,
         code: input.code,
         flowSummary: input.flowSummary,
-        spec: input.spec,
+        spec: input.spec
+          ? {
+              inputs: input.spec.inputs?.map(normalizeField),
+              outputs: input.spec.outputs?.map(normalizeField),
+              process: input.spec.process,
+            }
+          : undefined,
         position: input.position,
       },
       connections: {

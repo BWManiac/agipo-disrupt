@@ -30,11 +30,14 @@ const chatAgent = new Agent({
 
 export async function POST(request: Request) {
   try {
-    const { messages } = await request.json();
+    const { messages, workflowContext } = await request.json();
     console.log("📨 Received", messages.length, "messages");
-    
+
     // Validate UI messages from client; cast to broad type to satisfy agent generics.
-    const toolValidationMap = workflowTools as Record<string, Tool<unknown, unknown>>;
+    const toolValidationMap = workflowTools as unknown as Record<
+      string,
+      Tool<unknown, unknown>
+    >;
     type AgentMessage = Parameters<
       typeof chatAgent.respond
     >[0]["messages"][number];
@@ -44,7 +47,26 @@ export async function POST(request: Request) {
     });
     
     // Stream a UI-friendly response compatible with @ai-sdk/react useChat
-    const response = await chatAgent.respond({ messages: validated });
+    const augmentedMessages: AgentMessage[] = [
+      ...(workflowContext
+        ? [
+            {
+              role: "system",
+              parts: [
+                {
+                  type: "text",
+                  text: `Current workflow state:\n${workflowContext}`,
+                },
+              ],
+            } as AgentMessage,
+          ]
+        : []),
+      ...validated,
+    ];
+
+    const response = await chatAgent.respond({
+      messages: augmentedMessages,
+    });
     console.log("✅ Agent response generated");
     return response;
   } catch (error) {

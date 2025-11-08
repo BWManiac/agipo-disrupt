@@ -6,11 +6,20 @@ import type {
   NodeChange,
 } from "@xyflow/react";
 
+import type {
+  BusinessFieldType,
+  BusinessListItemType,
+  EdgeFieldRef,
+  EdgeMapping,
+  MatchResult,
+} from "../types/domain";
+
 export type WorkflowLayer = "flow" | "spec" | "code";
 
 export type ContractField = {
   name: string;
-  type: string;
+  type: BusinessFieldType;
+  itemType?: BusinessListItemType;
   description?: string;
   optional?: boolean;
 };
@@ -113,8 +122,28 @@ export type EditorUiSliceActions = {
 
 export type EditorUiSlice = EditorUiSliceState & EditorUiSliceActions;
 
+export type IoMappingSliceState = {
+  mappings: Record<string, EdgeMapping>;
+  activeEdgeId: string | null;
+};
+
+export type IoMappingSliceActions = {
+  setActiveEdge: (edgeId: string | null) => void;
+  linkFields: (
+    edgeId: string,
+    from: EdgeFieldRef | undefined,
+    to: EdgeFieldRef
+  ) => MatchResult;
+  unlinkField: (edgeId: string, to: EdgeFieldRef) => void;
+  setStaticValue: (edgeId: string, to: EdgeFieldRef, value: string) => void;
+  removeEdgeMapping: (edgeId: string) => void;
+};
+
+export type IoMappingSlice = IoMappingSliceState & IoMappingSliceActions;
+
 export type WorkflowGeneratorStore = WorkflowSlice &
   ExecutionSlice &
   WebcontainerSlice &
-  EditorUiSlice;
+  EditorUiSlice &
+  IoMappingSlice;
 

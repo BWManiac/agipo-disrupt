@@ -36,7 +36,7 @@ process.stdout.write("Data flows like a river!");`,
         inputs: [
           {
             name: "message",
-            type: "string",
+            type: "text",
             description: "Plain text captured from the requester.",
           },
         ],
@@ -48,7 +48,7 @@ process.stdout.write("Data flows like a river!");`,
         outputs: [
           {
             name: "cleanMessage",
-            type: "string",
+            type: "text",
             description: "Sanitized text ready for formatting.",
           },
         ],
@@ -83,7 +83,7 @@ rl.on('line', (line) => {
         inputs: [
           {
             name: "cleanMessage",
-            type: "string",
+            type: "text",
             description: "Sanitized text from the upstream node.",
           },
         ],
@@ -95,7 +95,7 @@ rl.on('line', (line) => {
         outputs: [
           {
             name: "asciiArt",
-            type: "string",
+            type: "text",
             description: "Cowsay-formatted string for display.",
           },
         ],
@@ -246,7 +246,7 @@ export const createWorkflowSlice: StateCreator<
                   ...node.data.spec,
                   inputs: node.data.spec.inputs.concat({
                     name: "",
-                    type: "",
+                    type: "text",
                     description: "",
                     optional: false,
                   }),
@@ -307,7 +307,7 @@ export const createWorkflowSlice: StateCreator<
                   ...node.data.spec,
                   outputs: node.data.spec.outputs.concat({
                     name: "",
-                    type: "",
+                    type: "text",
                     description: "",
                     optional: false,
                   }),

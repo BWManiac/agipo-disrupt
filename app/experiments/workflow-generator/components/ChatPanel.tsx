@@ -31,13 +31,43 @@ import {
 } from "@/components/ai-elements/tool";
 import { applyToolResult } from "../tools/applyToolResult";
 import type { ToolResult } from "../tools/toolIntents";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useWorkflowGeneratorStore } from "../store";
 import { serializeWorkflowContext } from "../services/workflowContextService";
 
 export function ChatPanel() {
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: "/api/agent",
+        prepareSendMessagesRequest: async ({
+          id,
+          messages,
+          body,
+          trigger,
+          messageId,
+        }) => {
+          const workflowContext = serializeWorkflowContext(
+            useWorkflowGeneratorStore.getState()
+          );
+
+          return {
+            body: {
+              ...(body ?? {}),
+              id,
+              messages,
+              trigger,
+              messageId,
+              workflowContext,
+            },
+          };
+        },
+      }),
+    []
+  );
+
   const { messages, sendMessage, status, addToolResult } = useChat({
-    transport: new DefaultChatTransport({ api: "/api/agent" }),
+    transport,
     onToolCall: async ({ toolCall }) => {
       const toolName =
         (toolCall as { toolName?: string }).toolName ?? "";
@@ -130,22 +160,17 @@ export function ChatPanel() {
       return;
     }
     setInput("");
-    const context = serializeWorkflowContext(useWorkflowGeneratorStore.getState());
-    const composedPrompt = [
-      "Current workflow state:",
-      context,
-      "",
-      "Instruction:",
-      trimmed,
-    ].join("\n");
-    return sendMessage({ text: composedPrompt });
+
+    return sendMessage({
+      text: trimmed,
+    });
   };
 
   const isSending = status === "submitted" || status === "streaming";
   const isSubmitDisabled = isSending || input.trim() === "";
 
-  const renderMessageParts = (messageParts: typeof messages[number]["parts"]) =>
-    messageParts.map((part, idx) => {
+  const renderMessageParts = (message: typeof messages[number]) =>
+    message.parts.map((part, idx) => {
       if (isToolUIPart(part)) {
         const toolTitle = String(getToolName(part));
         return (
@@ -164,7 +189,7 @@ export function ChatPanel() {
         );
       }
 
-      if (part.type === "text") {
+      if (part.type === "text" && message.role !== "system") {
         return (
           <div key={`text-${idx}`} className="whitespace-pre-wrap">
             {part.text}
@@ -196,11 +221,13 @@ export function ChatPanel() {
           />
         ) : (
           <ConversationContent>
-            {messages.map((m) => (
-              <Message from={m.role} key={m.id}>
-                <MessageContent>{renderMessageParts(m.parts)}</MessageContent>
-              </Message>
-            ))}
+            {messages
+              .filter((message) => message.role !== "system")
+              .map((message) => (
+                <Message from={message.role} key={message.id}>
+                  <MessageContent>{renderMessageParts(message)}</MessageContent>
+                </Message>
+              ))}
           </ConversationContent>
         )}
         <ConversationScrollButton />

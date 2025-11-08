@@ -3,9 +3,13 @@ import { z } from "zod";
 
 import type { ToolResult, UpdateNodeLayerIntent } from "./toolIntents";
 
+const BUSINESS_TYPES = ["text", "number", "flag", "list", "record", "file"] as const;
+const LIST_ITEM_TYPES = ["text", "number", "flag", "record", "file"] as const;
+
 const contractFieldSchema = z.object({
   name: z.string().min(1).describe("Field name"),
-  type: z.string().min(1).describe("Field type"),
+  type: z.enum(BUSINESS_TYPES).describe("Field type"),
+  itemType: z.enum(LIST_ITEM_TYPES).optional(),
   description: z.string().optional().describe("Optional description"),
   optional: z.boolean().optional().describe("Whether the field is optional"),
 });
@@ -50,6 +54,14 @@ export const updateNodeLayerTool = tool({
       .describe("Human-readable summary of the change for the UI."),
   }),
   async execute(input): Promise<ToolResult> {
+    const normalizeField = (field: z.infer<typeof contractFieldSchema>) => ({
+      name: field.name,
+      type: field.type,
+      itemType: field.type === "list" ? field.itemType ?? "text" : undefined,
+      description: field.description ?? "",
+      optional: field.optional ?? false,
+    });
+
     const intent: UpdateNodeLayerIntent = {
       type: "updateNodeLayer",
       nodeId: input.nodeId,
@@ -57,7 +69,15 @@ export const updateNodeLayerTool = tool({
         ...(input.title ? { title: input.title } : {}),
         ...(input.code ? { code: input.code } : {}),
         ...(input.flowSummary ? { flowSummary: input.flowSummary } : {}),
-        ...(input.spec ? { spec: input.spec } : {}),
+        ...(input.spec
+          ? {
+              spec: {
+                inputs: input.spec.inputs?.map(normalizeField),
+                outputs: input.spec.outputs?.map(normalizeField),
+                process: input.spec.process,
+              },
+            }
+          : {}),
       },
       rationale: input.rationale,
     };

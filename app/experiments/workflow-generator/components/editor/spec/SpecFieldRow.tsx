@@ -2,17 +2,48 @@
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { X } from "lucide-react";
 
+import type {
+  BusinessFieldType,
+  BusinessListItemType,
+} from "../../../types/domain";
+
+const FIELD_TYPES: BusinessFieldType[] = [
+  "text",
+  "number",
+  "flag",
+  "list",
+  "record",
+  "file",
+];
+
+const LIST_ITEM_TYPES: BusinessListItemType[] = [
+  "text",
+  "number",
+  "flag",
+  "record",
+  "file",
+];
+
 type SpecFieldRowProps = {
   name: string;
-  type: string;
+  type: BusinessFieldType;
+  itemType?: BusinessListItemType;
   description?: string;
   optional?: boolean;
   onChange: (patch: {
     name?: string;
-    type?: string;
+    type?: BusinessFieldType;
+    itemType?: BusinessListItemType;
     description?: string;
     optional?: boolean;
   }) => void;
@@ -22,11 +53,19 @@ type SpecFieldRowProps = {
 export function SpecFieldRow({
   name,
   type,
+  itemType,
   description,
   optional,
   onChange,
   onRemove,
 }: SpecFieldRowProps) {
+  const handleTypeChange = (value: BusinessFieldType) => {
+    onChange({
+      type: value,
+      itemType: value === "list" ? itemType ?? "text" : undefined,
+    });
+  };
+
   return (
     <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
       <div className="grid gap-3 md:grid-cols-2">
@@ -45,14 +84,53 @@ export function SpecFieldRow({
           <Label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
             Type
           </Label>
-          <input
-            value={type}
-            onChange={(event) => onChange({ type: event.target.value })}
-            placeholder="string"
-            className="w-full rounded-md border border-slate-200 bg-white px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <Select value={type} onValueChange={(value) =>
+            handleTypeChange(value as BusinessFieldType)
+          }>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Pick a type" />
+            </SelectTrigger>
+            <SelectContent>
+              {FIELD_TYPES.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option === "flag"
+                    ? "Flag (true/false)"
+                    : option === "list"
+                    ? "List"
+                    : option.charAt(0).toUpperCase() + option.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
+
+      {type === "list" ? (
+        <div className="space-y-1">
+          <Label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+            Item type
+          </Label>
+          <Select
+            value={itemType ?? "text"}
+            onValueChange={(value) =>
+              onChange({
+                itemType: value as BusinessListItemType,
+              })
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Pick an item type" />
+            </SelectTrigger>
+            <SelectContent>
+              {LIST_ITEM_TYPES.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option.charAt(0).toUpperCase() + option.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      ) : null}
 
       <div className="space-y-1">
         <Label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
@@ -70,9 +148,7 @@ export function SpecFieldRow({
         <label className="flex items-center gap-2 text-xs text-slate-500">
           <Checkbox
             checked={optional ?? false}
-            onCheckedChange={(value) =>
-              onChange({ optional: value === true })
-            }
+            onCheckedChange={(value) => onChange({ optional: value === true })}
           />
           Optional
         </label>

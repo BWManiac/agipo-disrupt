@@ -1,21 +1,56 @@
 "use client";
 
 import { NodeEditor } from "../editor/NodeEditor";
+import { EdgeEditorTable } from "../editor/data-mapping";
+import type { EdgeFieldRef, EdgeMapping } from "../../types/domain";
 import type { WorkflowNode } from "../../store/types";
+import type { MatchResult } from "../../types/domain";
 
 type EditorPanelProps = {
   node: WorkflowNode | null;
+  edgeId: string | null;
+  sourceNode: WorkflowNode | null;
+  targetNode: WorkflowNode | null;
+  mapping?: EdgeMapping;
+  onLink: (from: EdgeFieldRef | undefined, to: EdgeFieldRef) => MatchResult;
+  onUnlink: (to: EdgeFieldRef) => void;
+  onStaticValue: (to: EdgeFieldRef, value: string) => void;
 };
 
-export function EditorPanel({ node }: EditorPanelProps) {
-  if (!node) {
+export function EditorPanel({
+  node,
+  edgeId,
+  sourceNode,
+  targetNode,
+  mapping,
+  onLink,
+  onUnlink,
+  onStaticValue,
+}: EditorPanelProps) {
+  if (edgeId && targetNode) {
     return (
-      <div className="flex h-full items-center justify-center p-6 text-sm text-slate-400">
-        Select a node to edit its details.
+      <div className="h-full overflow-auto p-4">
+        <EdgeEditorTable
+          edgeId={edgeId}
+          sourceNode={sourceNode}
+          targetNode={targetNode}
+          mapping={mapping}
+          onLink={onLink}
+          onUnlink={onUnlink}
+          onStaticValue={onStaticValue}
+        />
       </div>
     );
   }
 
-  return <NodeEditor node={node} />;
+  if (node) {
+    return <NodeEditor node={node} />;
+  }
+
+  return (
+    <div className="flex h-full items-center justify-center p-6 text-sm text-slate-400">
+      Select a node or an edge to edit its details.
+    </div>
+  );
 }
 
