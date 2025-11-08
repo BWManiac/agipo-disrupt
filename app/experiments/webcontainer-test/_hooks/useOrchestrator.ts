@@ -145,9 +145,9 @@ export function useOrchestrator() {
     try {
       await installDependency(packageName, (chunk) =>
         appendOutput(setOutput, chunk)
-      );
+    );
     } finally {
-      setIsInstalling(false);
+    setIsInstalling(false);
     }
   }, [packageName]);
 
