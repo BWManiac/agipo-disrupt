@@ -42,7 +42,7 @@ export default function WorkflowGeneratorPage() {
   } = useExecution();
 
   const {
-    activeLayer,
+          activeLayer,
     setActiveLayer,
     activeSidebarTab,
     setSidebarTab,
