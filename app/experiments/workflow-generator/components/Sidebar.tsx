@@ -11,10 +11,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Edge } from "@xyflow/react";
 
 import type {
-  SidebarTab,
-  WorkflowLayer,
   WorkflowNode,
 } from "../store/types";
+import type {
+  SidebarTab,
+  WorkflowLayer,
+} from "../store/slices/editorSlice";
 import type { EdgeFieldRef, EdgeMapping, MatchResult } from "../types/domain";
 import { ConsolePanel } from "./sidebar/ConsolePanel";
 import { ContextPanel } from "./sidebar/ContextPanel";

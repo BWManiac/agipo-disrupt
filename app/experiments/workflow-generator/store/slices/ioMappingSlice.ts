@@ -17,10 +17,44 @@ import type {
   EdgeFieldRef,
   EdgeLink,
   EdgeMapping,
-  IoMappingSlice,
   MatchResult,
+} from "../../types/domain";
+import type {
   WorkflowGeneratorStore,
-} from "./types";
+} from "../types";
+
+export interface IoMappingSliceState {
+  mappings: Record<string, EdgeMapping>;
+  activeEdgeId: string | null;
+}
+
+export interface IoMappingSliceActions {
+  /**
+   * Track whichever edge the user just interacted with so the sidebar can swap
+   * between node/edge editors.
+   */
+  setActiveEdge: (edgeId: string | null) => void;
+  /**
+   * Link a source field to a target field.  Returns a `MatchResult` so callers
+   * can surface warnings about incompatible types without throwing runtime errors.
+   */
+  linkFields: (
+    edgeId: string,
+    from: EdgeFieldRef | undefined,
+    to: EdgeFieldRef
+  ) => MatchResult;
+  /** Remove an existing binding for a target input. */
+  unlinkField: (edgeId: string, to: EdgeFieldRef) => void;
+  /**
+   * Store a static/default value for targets when no upstream source is
+   * available (e.g. constant parameters).
+   */
+  setStaticValue: (edgeId: string, to: EdgeFieldRef, value: string) => void;
+  /** Cleanup hook for when an edge is deleted. */
+  removeEdgeMapping: (edgeId: string) => void;
+}
+
+export type IoMappingSlice = IoMappingSliceState & IoMappingSliceActions;
 
 const createFieldRef = ({
   nodeId,

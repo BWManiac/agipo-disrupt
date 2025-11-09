@@ -1,30 +1,29 @@
 /**
  * Workflow Generator store composition.
  *
- * Each slice stays in its own module (workflow, execution, webcontainer bridge,
- * UI/editor metadata, IO mapping).  This file stitches them together so
+ * Each slice stays in its own module. This file stitches them together so
  * `useWorkflowGeneratorStore` exposes a single hook to the rest of the app.
  *
  * We keep this layer intentionally slim: no business logic, just the wiring.
  */
 import { create } from "zustand";
 
-import { createExecutionSlice } from "./executionSlice";
-import { createWebcontainerSlice } from "./webcontainerSlice";
-import { createWorkflowSlice } from "./workflowSlice";
+import { createCanvasSlice } from "./slices/canvasSlice";
+import { createNodeSpecSlice } from "./slices/nodeSpecSlice";
+import { createEditorSlice } from "./slices/editorSlice";
+import { createExecutionSlice } from "./slices/executionSlice";
+import { createIoMappingSlice } from "./slices/ioMappingSlice";
+import { createWebcontainerSlice } from "./slices/webcontainerSlice";
 import type { WorkflowGeneratorStore } from "./types";
-import { createEditorSlice } from "./ui/editorSlice";
-import { createIoMappingSlice } from "./ioMappingSlice";
 
 export const useWorkflowGeneratorStore = create<WorkflowGeneratorStore>()(
   (...args) => ({
-    ...createWorkflowSlice(...args),
-    ...createExecutionSlice(...args),
-    ...createWebcontainerSlice(...args),
-    // Keep UI/editor state after data slices so view logic can rely on core data.
+    ...createCanvasSlice(...args),
+    ...createNodeSpecSlice(...args),
     ...createEditorSlice(...args),
-    // Edge bindings come last because they may derive validation rules from previous slices.
+    ...createExecutionSlice(...args),
     ...createIoMappingSlice(...args),
+    ...createWebcontainerSlice(...args),
   })
 );
 

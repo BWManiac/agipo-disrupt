@@ -3,11 +3,27 @@ import type { StateCreator } from "zustand";
 import {
   installDependency as installDependencyService,
   runWorkflow as runWorkflowService,
-} from "../services/workflowExecutionService";
+} from "../../services/workflowExecutionService";
 import type {
-  ExecutionSlice,
   WorkflowGeneratorStore,
-} from "./types";
+} from "../types";
+
+export interface ExecutionSliceState {
+  output: string;
+  packageName: string;
+  isInstalling: boolean;
+  isRunning: boolean;
+}
+
+export interface ExecutionSliceActions {
+  setPackageName: (pkg: string) => void;
+  resetOutput: () => void;
+  appendOutput: (chunk: string) => void;
+  installDependency: () => Promise<void>;
+  runWorkflow: () => Promise<void>;
+}
+
+export type ExecutionSlice = ExecutionSliceState & ExecutionSliceActions;
 
 export const createExecutionSlice: StateCreator<
   WorkflowGeneratorStore,

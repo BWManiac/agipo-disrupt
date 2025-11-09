@@ -3,11 +3,23 @@ import type { StateCreator } from "zustand";
 import {
   ensureRuntimeReady,
   teardownRuntime as teardownRuntimeService,
-} from "../services/webcontainerService";
+} from "../../services/webcontainerService";
 import type {
   WebcontainerSlice,
   WorkflowGeneratorStore,
-} from "./types";
+} from "../types";
+
+export interface WebcontainerSliceState {
+  isBooting: boolean;
+  isReady: boolean;
+}
+
+export interface WebcontainerSliceActions {
+  bootRuntime: () => Promise<void>;
+  teardownRuntime: () => Promise<void>;
+}
+
+export type WebcontainerSlice = WebcontainerSliceState & WebcontainerSliceActions;
 
 export const createWebcontainerSlice: StateCreator<
   WorkflowGeneratorStore,
