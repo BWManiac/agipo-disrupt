@@ -2,6 +2,21 @@
 **Date:** {{DATE:today}}  
 **Author:** Engineering Notes
 
+| Tool | Test | Prompt Outline | Expected Result |
+| --- | --- | --- | --- |
+| `update_node_layer` | Update flow summary only | “Update node 1 flow summary to …” | Tool call with `nodeId: "1"`, `changes.flowSummary` and UI reflects summary change |
+|  | Replace code & spec | “Replace node 2 code with … and set spec outputs to …” | Tool intent updates code + outputs array |
+| `add_node` | Add standalone node | “Add a node called … with summary …” | New node appears with generated id, default placement |
+|  | Add node with connections | “Add node between 1 and 2…” | Node inserted and edges created from `1 -> new -> 2` |
+| `delete_node` | Remove leaf node | “Delete node 3” | Node and edges removed |
+|  | Remove middle node | “Delete node 2” | Node removed and edges touching it pruned |
+| `connect_nodes` | Create new edge | “Connect node 1 to node 2” | Edge added unless duplicate |
+|  | Prevent duplicate | Re-run same prompt | Agent should respond that edge already exists / no new edge |
+| `reposition_nodes` | Grid layout | “Arrange nodes in a grid layout” | All nodes repositioned to grid |
+|  | Explicit positions | “Move node 1 to (0,0) and node 2 to (200,0)” | Nodes positioned exactly |
+| `inspect_node` | Inspect existing node | “Inspect node 1 with connections” | Tool output shows node data + edges |
+|  | Inspect missing node | “Inspect node X999” | Tool error (handled in UI) |
+
 ---
 
 ## Executive Summary

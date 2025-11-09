@@ -87,77 +87,10 @@ export function ChatPanel() {
 
   const { messages, sendMessage, status, addToolResult } = useChat({
     transport,
-    onToolCall: async ({ toolCall }) => {
-      // Only `inspect_node` executes locally (read-only). All mutation tools
-      // route through the API because they run on the server via the agent.
-      const toolName =
-        (toolCall as { toolName?: string }).toolName ?? "";
-
-      if (toolName !== "inspect_node") {
-        return;
-      }
-
-      const args =
-        (toolCall as { args?: Record<string, unknown> }).args ??
-        (toolCall as { input?: Record<string, unknown> }).input ??
-        {};
-
-      const nodeId = typeof args?.nodeId === "string" ? args.nodeId : undefined;
-      const includeConnections =
-        typeof args?.includeConnections === "boolean"
-          ? args.includeConnections
-          : false;
-
-      if (!nodeId) {
-        await addToolResult({
-          state: "output-error",
-          tool: "inspect_node",
-          toolCallId: toolCall.toolCallId,
-          errorText: "Missing nodeId in tool call.",
-        });
-        return;
-      }
-
-      const state = useWorkflowGeneratorStore.getState();
-      const node = state.nodes.find((n) => n.id === nodeId);
-
-      if (!node) {
-        await addToolResult({
-          state: "output-error",
-          tool: "inspect_node",
-          toolCallId: toolCall.toolCallId,
-          errorText: `Node ${nodeId} was not found.`,
-        });
-        return;
-      }
-
-      const incomingEdges = includeConnections
-        ? state.edges.filter((edge) => edge.target === nodeId)
-        : [];
-      const outgoingEdges = includeConnections
-        ? state.edges.filter((edge) => edge.source === nodeId)
-        : [];
-
-      await addToolResult({
-        tool: "inspect_node",
-        toolCallId: toolCall.toolCallId,
-        output: {
-          node: {
-            id: node.id,
-            title: node.data.title,
-            code: node.data.code,
-            flowSummary: node.data.flow.summary,
-            spec: node.data.spec,
-            position: node.position,
-          },
-          incomingEdges,
-          outgoingEdges,
-        },
-      });
-    },
   });
   const [input, setInput] = useState("");
   const processedToolCallIds = useRef<Set<string>>(new Set());
+  const handledInspectToolCalls = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     // When tool responses arrive, convert their structured intent payloads into
@@ -165,6 +98,70 @@ export function ChatPanel() {
     for (const message of messages) {
       for (const part of message.parts) {
         if (!isToolUIPart(part)) continue;
+
+         if (
+          String(getToolName(part)) === "inspect_node" &&
+          part.state === "input-available" &&
+          !handledInspectToolCalls.current.has(part.toolCallId)
+        ) {
+          handledInspectToolCalls.current.add(part.toolCallId);
+
+          const nodeId =
+            typeof (part.input as Record<string, unknown> | undefined)?.nodeId ===
+            "string"
+              ? ((part.input as Record<string, unknown>).nodeId as string)
+              : undefined;
+          const includeConnections =
+            typeof (part.input as Record<string, unknown> | undefined)
+              ?.includeConnections === "boolean"
+              ? Boolean(
+                  (part.input as Record<string, unknown>).includeConnections
+                )
+              : false;
+
+          const state = useWorkflowGeneratorStore.getState();
+          const node = nodeId
+            ? state.nodes.find((candidate) => candidate.id === nodeId)
+            : undefined;
+
+          if (!nodeId || !node) {
+            void addToolResult({
+              state: "output-error",
+              tool: "inspect_node",
+              toolCallId: part.toolCallId,
+              errorText: nodeId
+                ? `Node ${nodeId} was not found.`
+                : "Node ID missing in inspect request.",
+            });
+            continue;
+          }
+
+          const incomingEdges = includeConnections
+            ? state.edges.filter((edge) => edge.target === nodeId)
+            : [];
+          const outgoingEdges = includeConnections
+            ? state.edges.filter((edge) => edge.source === nodeId)
+            : [];
+
+          void addToolResult({
+            state: "output-available",
+            tool: "inspect_node",
+            toolCallId: part.toolCallId,
+            output: {
+              node: {
+                id: node.id,
+                title: node.data.title,
+                code: node.data.code,
+                flowSummary: node.data.flow.summary,
+                spec: node.data.spec,
+                position: node.position,
+              },
+              incomingEdges,
+              outgoingEdges,
+            },
+          });
+        }
+
         if (part.state !== "output-available") continue;
         if (processedToolCallIds.current.has(part.toolCallId)) continue;
 
@@ -175,7 +172,7 @@ export function ChatPanel() {
         }
       }
     }
-  }, [messages]);
+  }, [messages, addToolResult]);
 
   const handlePromptSubmit = ({ text }: PromptInputMessage) => {
     const trimmed = (text ?? "").trim();
