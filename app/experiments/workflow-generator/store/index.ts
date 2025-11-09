@@ -14,6 +14,7 @@ import { createEditorSlice } from "./slices/editorSlice";
 import { createExecutionSlice } from "./slices/executionSlice";
 import { createIoMappingSlice } from "./slices/ioMappingSlice";
 import { createWebcontainerSlice } from "./slices/webcontainerSlice";
+import { createPersistenceSlice } from "./slices/persistenceSlice";
 import type { WorkflowGeneratorStore } from "./types";
 
 export const useWorkflowGeneratorStore = create<WorkflowGeneratorStore>()(
@@ -24,6 +25,7 @@ export const useWorkflowGeneratorStore = create<WorkflowGeneratorStore>()(
     ...createExecutionSlice(...args),
     ...createIoMappingSlice(...args),
     ...createWebcontainerSlice(...args),
+    ...createPersistenceSlice(...args),
   })
 );
 

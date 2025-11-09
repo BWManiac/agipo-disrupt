@@ -10,7 +10,7 @@
  */
 import "@xyflow/react/dist/style.css";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { Background, Controls, ReactFlow } from "@xyflow/react";
@@ -25,26 +25,26 @@ import { useEditorState } from "./hooks/useEditorState";
 import { useExecution } from "./hooks/useExecution";
 import { useWebContainer } from "./hooks/useWebContainer";
 import { useWorkflowCanvasLogic } from "./hooks/useWorkflowCanvasLogic";
+import { usePersistence } from "./hooks/usePersistence";
 
-export default function WorkflowGeneratorPage() {
-  // This hook manages the WebContainer lifecycle (boot/teardown)
+function WorkflowEditor() {
   useWebContainer();
 
   const searchParams = useSearchParams();
   const workflowId = searchParams.get("id");
 
   // Pull in all state and actions from our custom hooks
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode } =
+    useCanvasState();
+
   const {
-    nodes,
-    edges,
-    onNodesChange,
-    onEdgesChange,
-    onConnect,
-    addNode,
-    workflowName,
     loadCompleteWorkflow,
     resetWorkflowState,
-  } = useCanvasState();
+    workflowName,
+    isSaving,
+    saveCurrentWorkflow,
+    setWorkflowName,
+  } = usePersistence();
 
   useEffect(() => {
     if (!workflowId) {
@@ -81,12 +81,9 @@ export default function WorkflowGeneratorPage() {
     packageName,
     isBooting,
     isInstalling,
-    isSaving,
     installDependency,
     runWorkflow,
     setPackageName,
-    saveCurrentWorkflow,
-    setWorkflowName,
   } = useExecution();
 
   const {
@@ -165,5 +162,13 @@ export default function WorkflowGeneratorPage() {
       />
     </div>
   );
+}
+
+export default function WorkflowGeneratorPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <WorkflowEditor />
+        </Suspense>
+    )
 }
 

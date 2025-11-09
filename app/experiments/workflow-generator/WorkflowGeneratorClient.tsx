@@ -12,6 +12,7 @@ import { useEditorState } from "./hooks/useEditorState";
 import { useExecution } from "./hooks/useExecution";
 import { useWebContainer } from "./hooks/useWebContainer";
 import { useWorkflowCanvasLogic } from "./hooks/useWorkflowCanvasLogic";
+import { usePersistence } from "./hooks/usePersistence";
 
 export default function WorkflowGeneratorClient() {
   useWebContainer();
@@ -19,17 +20,17 @@ export default function WorkflowGeneratorClient() {
   const searchParams = useSearchParams();
   const workflowId = searchParams.get("id");
 
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode } =
+    useCanvasState();
+
   const {
-    nodes,
-    edges,
-    onNodesChange,
-    onEdgesChange,
-    onConnect,
-    addNode,
     workflowName,
     loadCompleteWorkflow,
     resetWorkflowState,
-  } = useCanvasState();
+    isSaving,
+    saveCurrentWorkflow,
+    setWorkflowName,
+  } = usePersistence();
 
   useEffect(() => {
     if (!workflowId) {
@@ -66,12 +67,9 @@ export default function WorkflowGeneratorClient() {
     packageName,
     isBooting,
     isInstalling,
-    isSaving,
     installDependency,
     runWorkflow,
     setPackageName,
-    saveCurrentWorkflow,
-    setWorkflowName,
   } = useExecution();
 
   const {

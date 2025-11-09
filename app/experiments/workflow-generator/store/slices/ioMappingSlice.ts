@@ -23,39 +23,36 @@ import type {
   WorkflowGeneratorStore,
 } from "../types";
 
+// 1. State Interface
 export interface IoMappingSliceState {
+  /** A record of all edge mappings, keyed by edge ID. */
   mappings: Record<string, EdgeMapping>;
+  /** The ID of the edge currently selected by the user. */
   activeEdgeId: string | null;
 }
 
+// 2. Actions Interface
 export interface IoMappingSliceActions {
-  /**
-   * Track whichever edge the user just interacted with so the sidebar can swap
-   * between node/edge editors.
-   */
+  /** Tracks which edge the user has selected. */
   setActiveEdge: (edgeId: string | null) => void;
-  /**
-   * Link a source field to a target field.  Returns a `MatchResult` so callers
-   * can surface warnings about incompatible types without throwing runtime errors.
-   */
+  /** Links an output field from a source node to an input field on a target node. */
   linkFields: (
     edgeId: string,
     from: EdgeFieldRef | undefined,
     to: EdgeFieldRef
   ) => MatchResult;
-  /** Remove an existing binding for a target input. */
+  /** Removes an existing binding for a target input. */
   unlinkField: (edgeId: string, to: EdgeFieldRef) => void;
-  /**
-   * Store a static/default value for targets when no upstream source is
-   * available (e.g. constant parameters).
-   */
+  /** Stores a static default value for a target input. */
   setStaticValue: (edgeId: string, to: EdgeFieldRef, value: string) => void;
-  /** Cleanup hook for when an edge is deleted. */
+  /** Cleans up the mapping for a given edge when it is deleted. */
   removeEdgeMapping: (edgeId: string) => void;
 }
 
+// 3. Combined Slice Type
 export type IoMappingSlice = IoMappingSliceState & IoMappingSliceActions;
 
+// Helper functions (kept co-located as they are specific to this slice's logic)
 const createFieldRef = ({
   nodeId,
   fieldName,
@@ -72,39 +69,29 @@ const typesCompatible = (
   from?: EdgeFieldRef,
   to?: EdgeFieldRef
 ): MatchResult => {
-  // Downstream missing -> the caller passed bad data; warn and bail.
-  if (!to) {
-    return { status: "warning", reason: "missing-downstream" };
+  if (!to) return { status: "warning", reason: "missing-downstream" };
+  if (!from) return { status: "warning", reason: "missing-upstream" };
+  if (from.type !== to.type) return { status: "warning", reason: "type-mismatch" };
+  if (from.type === "list" && from.itemType !== to.itemType) {
+    return { status: "warning", reason: "list-item-mismatch" };
   }
-
-  // Allow static/default values by returning a warning that UI can visualise.
-  if (!from) {
-    return { status: "warning", reason: "missing-upstream" };
-  }
-
-  // Simple equality check keeps runtime cheap; coercion belongs in wrappers.
-  if (from.type !== to.type) {
-    return { status: "warning", reason: "type-mismatch" };
-  }
-
-  // List fields carry a secondary item type which must also match.
-  if (from.type === "list") {
-    if (from.itemType !== to.itemType) {
-      return { status: "warning", reason: "list-item-mismatch" };
-    }
-  }
-
   return { status: "ok" };
 };
 
+// 4. Initial State
+const initialState: IoMappingSliceState = {
+  mappings: {},
+  activeEdgeId: null,
+};
+
+// 5. Slice Creator
 export const createIoMappingSlice: StateCreator<
   WorkflowGeneratorStore,
   [],
   [],
   IoMappingSlice
 > = (set, get) => ({
-  mappings: {},
-  activeEdgeId: null,
+  ...initialState,
 
   setActiveEdge: (edgeId) => {
     set(() => ({
@@ -224,4 +211,5 @@ export const createIoMappingSlice: StateCreator<
     });
   },
 });
+
 

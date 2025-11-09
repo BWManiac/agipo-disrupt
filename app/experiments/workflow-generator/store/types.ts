@@ -15,6 +15,7 @@ import type { EditorSlice, WorkflowLayer } from "./slices/editorSlice";
 import type { ExecutionSlice } from "./slices/executionSlice";
 import type { IoMappingSlice } from "./slices/ioMappingSlice";
 import type { WebcontainerSlice } from "./slices/webcontainerSlice";
+import type { PersistenceSlice } from "./slices/persistenceSlice";
 
 export type { WorkflowLayer, WebcontainerSlice };
 
@@ -50,5 +51,6 @@ export type WorkflowGeneratorStore = CanvasSlice &
   EditorSlice &
   ExecutionSlice &
   IoMappingSlice &
-  WebcontainerSlice;
+  WebcontainerSlice &
+  PersistenceSlice;
 
