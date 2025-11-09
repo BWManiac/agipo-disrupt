@@ -1,4 +1,4 @@
-import { getToolName, isToolUIPart, type Message as VercelAIMessage } from "ai";
+import { getToolName, isToolUIPart, type UIMessage as VercelAIMessage } from "ai";
 import { Message, MessageContent } from "@/components/ai-elements/message";
 import {
   Tool,

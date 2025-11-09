@@ -11,10 +11,12 @@ import type {
 } from "../types/domain";
 import type { CanvasSlice } from "./slices/canvasSlice";
 import type { NodeSpecSlice } from "./slices/nodeSpecSlice";
-import type { EditorSlice } from "./slices/editorSlice";
+import type { EditorSlice, WorkflowLayer } from "./slices/editorSlice";
 import type { ExecutionSlice } from "./slices/executionSlice";
 import type { IoMappingSlice } from "./slices/ioMappingSlice";
 import type { WebcontainerSlice } from "./slices/webcontainerSlice";
+
+export type { WorkflowLayer, WebcontainerSlice };
 
 export type ContractField = {
   name: string;

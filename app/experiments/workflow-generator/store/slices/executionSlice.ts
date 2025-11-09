@@ -1,18 +1,18 @@
-import type { StateCreator } from "zustand";
+import { nanoid } from "nanoid";
+import { type StateCreator } from "zustand";
 
 import {
   installDependency as installDependencyService,
   runWorkflow as runWorkflowService,
 } from "../../services/workflowExecutionService";
-import type {
-  WorkflowGeneratorStore,
-} from "../types";
+import type { WorkflowGeneratorStore } from "../types";
 
 export interface ExecutionSliceState {
   output: string;
   packageName: string;
   isInstalling: boolean;
   isRunning: boolean;
+  isSaving: boolean;
 }
 
 export interface ExecutionSliceActions {
@@ -21,6 +21,7 @@ export interface ExecutionSliceActions {
   appendOutput: (chunk: string) => void;
   installDependency: () => Promise<void>;
   runWorkflow: () => Promise<void>;
+  saveCurrentWorkflow: () => Promise<void>;
 }
 
 export type ExecutionSlice = ExecutionSliceState & ExecutionSliceActions;
@@ -35,6 +36,7 @@ export const createExecutionSlice: StateCreator<
   packageName: "cowsay",
   isInstalling: false,
   isRunning: false,
+  isSaving: false,
 
   setPackageName: (pkg: string) =>
     set(() => ({
@@ -120,6 +122,61 @@ export const createExecutionSlice: StateCreator<
         nodes.map((node) => node.id),
         false
       );
+    }
+  },
+
+  saveCurrentWorkflow: async () => {
+    set({ isSaving: true });
+    const { nodes, edges, workflowName, currentWorkflowId } = get();
+
+    // Use a more descriptive ID if the name is available
+    const id = currentWorkflowId || workflowName.toLowerCase().replace(/\s+/g, '-') || nanoid();
+
+    if (!workflowName) {
+      alert("Please enter a name for the workflow before saving.");
+      set({ isSaving: false });
+      return;
+    }
+
+    const workflowData = {
+      id,
+      name: workflowName,
+      description: "Workflow saved from the editor.", // Placeholder description
+      nodes,
+      edges,
+    };
+
+    try {
+      const url = currentWorkflowId
+        ? `/api/workflows/${currentWorkflowId}`
+        : "/api/workflows";
+      const method = currentWorkflowId ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(workflowData),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to save workflow. Server responded with ${response.status}`
+        );
+      }
+
+      const savedWorkflow = await response.json();
+
+      // If it was a new workflow, update the ID in the store
+      if (!currentWorkflowId) {
+        get().loadCompleteWorkflow(savedWorkflow); // Use existing loader to set state
+      }
+
+      alert("Workflow saved!");
+    } catch (error) {
+      console.error(error);
+      alert("Error saving workflow.");
+    } finally {
+      set({ isSaving: false });
     }
   },
 });

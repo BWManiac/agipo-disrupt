@@ -1,10 +1,11 @@
 import { useEffect, useRef } from "react";
-import { getToolName, isToolUIPart, type UseChatHelpers } from "ai";
+import { getToolName, isToolUIPart, type UIMessage } from "ai";
+import type { UseChatHelpers } from "@ai-sdk/react";
 import { useWorkflowGeneratorStore } from "../../../store";
 import { applyToolResult } from "../../../tools/applyToolResult";
 import type { ToolResult } from "../../../tools/toolIntents";
 
-type ChatHelpers = Pick<UseChatHelpers, "messages" | "addToolResult">;
+type ChatHelpers = Pick<UseChatHelpers<UIMessage>, "messages" | "addToolResult">;
 
 /**
  * @file app/experiments/workflow-generator/components/chat-panel/hooks/useChatTools.ts

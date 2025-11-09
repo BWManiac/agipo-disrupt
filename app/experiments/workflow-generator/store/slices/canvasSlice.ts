@@ -13,6 +13,8 @@ import {
   type WorkflowNode,
 } from "../types";
 
+import type { WorkflowData } from "@/app/workflows/repository/FileSystemWorkflowRepository";
+
 const generateNodeId = () => Math.random().toString(36).slice(2, 6);
 
 const initialNodes: WorkflowNode[] = [
@@ -104,9 +106,16 @@ rl.on('line', (line) => {
 
 const initialEdges = [{ id: "e1-2", source: "1", target: "2" }] as const;
 
+const cloneInitialNodes = (): WorkflowNode[] =>
+  JSON.parse(JSON.stringify(initialNodes)) as WorkflowNode[];
+
+const cloneInitialEdges = () => initialEdges.map((edge) => ({ ...edge }));
+
 export interface CanvasSliceState {
   nodes: WorkflowNode[];
   edges: Edge[];
+  currentWorkflowId: string | null;
+  workflowName: string;
 }
 
 export interface CanvasSliceActions {
@@ -118,6 +127,9 @@ export interface CanvasSliceActions {
   updateNodeFlowSummary: (nodeId: string, summary: string) => void;
   markNodesRunning: (nodeIds: string[], isRunning: boolean) => void;
   updateNodeTitle: (nodeId: string, title: string) => void;
+  setWorkflowName: (name: string) => void;
+  loadCompleteWorkflow: (data: WorkflowData) => void;
+  resetWorkflowState: () => void;
 }
 
 export type CanvasSlice = CanvasSliceState & CanvasSliceActions;
@@ -128,8 +140,10 @@ export const createCanvasSlice: StateCreator<
   [],
   CanvasSlice
 > = (set) => ({
-  nodes: initialNodes,
-  edges: initialEdges.map((edge) => ({ ...edge })),
+  nodes: cloneInitialNodes(),
+  edges: cloneInitialEdges(),
+  currentWorkflowId: null,
+  workflowName: "",
   onNodesChange: (changes: NodeChange<WorkflowNode>[]) =>
     set((state) => ({
       nodes: applyNodeChanges(changes, state.nodes),
@@ -234,4 +248,23 @@ export const createCanvasSlice: StateCreator<
           : node
       ),
     })),
+  setWorkflowName: (name: string) => {
+    set({ workflowName: name });
+  },
+  loadCompleteWorkflow: (data: WorkflowData) => {
+    set({
+      nodes: data.nodes || [],
+      edges: data.edges || [],
+      workflowName: data.name || "",
+      currentWorkflowId: data.id,
+    });
+  },
+  resetWorkflowState: () => {
+    set({
+      nodes: cloneInitialNodes(),
+      edges: cloneInitialEdges(),
+      workflowName: "",
+      currentWorkflowId: null,
+    });
+  },
 });

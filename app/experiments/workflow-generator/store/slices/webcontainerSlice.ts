@@ -5,7 +5,6 @@ import {
   teardownRuntime as teardownRuntimeService,
 } from "../../services/webcontainerService";
 import type {
-  WebcontainerSlice,
   WorkflowGeneratorStore,
 } from "../types";
 

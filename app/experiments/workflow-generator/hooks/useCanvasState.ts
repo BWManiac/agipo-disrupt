@@ -16,6 +16,18 @@ export function useCanvasState() {
   const onConnect = useWorkflowGeneratorStore((state) => state.onConnect);
   const addNode = useWorkflowGeneratorStore((state) => state.addNode);
 
+  // New state for workflow identity
+  const workflowName = useWorkflowGeneratorStore((state) => state.workflowName);
+  const currentWorkflowId = useWorkflowGeneratorStore(
+    (state) => state.currentWorkflowId
+  );
+  const loadCompleteWorkflow = useWorkflowGeneratorStore(
+    (state) => state.loadCompleteWorkflow
+  );
+  const resetWorkflowState = useWorkflowGeneratorStore(
+    (state) => state.resetWorkflowState
+  );
+
   return {
     nodes,
     onNodesChange,
@@ -23,5 +35,9 @@ export function useCanvasState() {
     onEdgesChange,
     onConnect,
     addNode,
+    workflowName,
+    currentWorkflowId,
+    loadCompleteWorkflow,
+    resetWorkflowState,
   };
 }
