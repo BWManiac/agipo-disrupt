@@ -38,15 +38,13 @@ export function HeroSection() {
         </div>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Button size="lg" className="px-6 py-6 text-base" asChild>
-            <Link href="/experiments/webcontainer-test">Create an agent</Link>
+            <Link href="/experiments/workflow-generator">Create an agent</Link>
           </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="px-6 py-6 text-base"
-            asChild
-          >
+          <Button size="lg" className="px-6 py-6 text-base" asChild>
             <Link href="/marketplace">Browse marketplace</Link>
+          </Button>
+          <Button size="lg" className="px-6 py-6 text-base" asChild>
+            <Link href="/workflows">View my workflows</Link>
           </Button>
         </div>
         <p className="mt-4 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
