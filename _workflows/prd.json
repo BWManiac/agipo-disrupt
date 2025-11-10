@@ -1,0 +1,137 @@
+{
+  "id": "prd",
+  "name": "PRD",
+  "description": "Workflow saved from the editor.",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "code",
+      "position": {
+        "x": -100,
+        "y": 200
+      },
+      "data": {
+        "id": "1",
+        "title": "Collect Input",
+        "code": "// This node simply outputs a string to be used by the next node.\nprocess.stdout.write(\"Data flows like a river!\");",
+        "isRunning": false,
+        "flow": {
+          "summary": "Listen for the source message, tidy it up, and pass it downstream."
+        },
+        "spec": {
+          "inputs": [
+            {
+              "name": "message",
+              "type": "text",
+              "description": "Plain text captured from the requester."
+            }
+          ],
+          "process": [
+            "Trim whitespace and normalize spacing.",
+            "Remove unsupported characters.",
+            "Emit a clean string for the next node."
+          ],
+          "outputs": [
+            {
+              "name": "cleanMessage",
+              "type": "text",
+              "description": "Sanitized text ready for formatting."
+            }
+          ]
+        }
+      },
+      "measured": {
+        "width": 360,
+        "height": 274
+      },
+      "selected": true
+    },
+    {
+      "id": "2",
+      "type": "code",
+      "position": {
+        "x": -52,
+        "y": 669
+      },
+      "data": {
+        "id": "2",
+        "title": "Format Message",
+        "code": "const cowsay = require('cowsay');\nconst readline = require('readline');\n\nconst rl = readline.createInterface({ input: process.stdin });\n\nrl.on('line', (line) => {\n  console.log(cowsay.say({\n    text: line,\n    e: 'oO',\n    T: 'U '\n  }));\n});",
+        "isRunning": false,
+        "flow": {
+          "summary": "Apply the cowsay persona to the cleaned message and render ASCII art."
+        },
+        "spec": {
+          "inputs": [
+            {
+              "name": "cleanMessage",
+              "type": "text",
+              "description": "Sanitized text from the upstream node."
+            }
+          ],
+          "process": [
+            "Load cowsay template and tone modifiers.",
+            "Wrap lines to keep width manageable.",
+            "Render final ASCII output."
+          ],
+          "outputs": [
+            {
+              "name": "asciiArt",
+              "type": "text",
+              "description": "Cowsay-formatted string for display."
+            }
+          ]
+        }
+      },
+      "measured": {
+        "width": 360,
+        "height": 274
+      },
+      "selected": true,
+      "dragging": false
+    },
+    {
+      "id": "2920",
+      "type": "code",
+      "position": {
+        "x": 486,
+        "y": 483
+      },
+      "data": {
+        "id": "2920",
+        "title": "Node 2920",
+        "code": "// New node — write your transformation here.",
+        "isRunning": false,
+        "flow": {
+          "summary": "Describe this step to help teammates understand the transformation."
+        },
+        "spec": {
+          "inputs": [],
+          "process": [
+            "Document the transformation logic here."
+          ],
+          "outputs": []
+        }
+      },
+      "measured": {
+        "width": 360,
+        "height": 274
+      },
+      "selected": true,
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1-2",
+      "source": "1",
+      "target": "2"
+    },
+    {
+      "source": "2",
+      "target": "2920",
+      "id": "xy-edge__2-2920"
+    }
+  ],
+  "lastModified": "2025-11-09T06:35:04.874Z"
+}

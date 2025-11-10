@@ -16,8 +16,10 @@ import type { ExecutionSlice } from "./slices/executionSlice";
 import type { IoMappingSlice } from "./slices/ioMappingSlice";
 import type { WebcontainerSlice } from "./slices/webcontainerSlice";
 import type { PersistenceSlice } from "./slices/persistenceSlice";
+import type { SettingsSlice, ApiKeyMap } from "./slices/settingsSlice";
 
 export type { WorkflowLayer, WebcontainerSlice };
+export type { ApiKeyMap };
 
 export type ContractField = {
   name: string;
@@ -52,5 +54,6 @@ export type WorkflowGeneratorStore = CanvasSlice &
   ExecutionSlice &
   IoMappingSlice &
   WebcontainerSlice &
-  PersistenceSlice;
+  PersistenceSlice &
+  SettingsSlice;
 

@@ -1,6 +1,7 @@
 import type { Edge } from "@xyflow/react";
 
 import { ensureRuntimeReady, spawnProcess } from "./webcontainerService";
+import { useWorkflowGeneratorStore } from "../store";
 import type { WorkflowNode } from "../store/types";
 
 type Workflow = {
@@ -71,10 +72,16 @@ export const installDependency = async (
 
   await ensureRuntimeReady();
 
-  const process = await spawnProcess("sh", [
-    "-c",
-    `cd /tmp && npm install ${packageName}`,
-  ]);
+  const apiKeys = useWorkflowGeneratorStore.getState().apiKeys;
+  const env = Object.fromEntries(
+    Object.entries(apiKeys).filter(([, value]) => value)
+  );
+
+  const process = await spawnProcess(
+    "sh",
+    ["-c", `cd /tmp && npm install ${packageName}`],
+    { env }
+  );
 
   process.output.pipeTo(
     new WritableStream({
@@ -93,6 +100,10 @@ export const runWorkflow = async (
   handlers: ChainLifecycleHandlers = {}
 ): Promise<void> => {
   const chains = buildChains(workflow);
+  const apiKeys = useWorkflowGeneratorStore.getState().apiKeys;
+  const env = Object.fromEntries(
+    Object.entries(apiKeys).filter(([, value]) => value)
+  );
 
   for (const chain of chains) {
     handlers.onChainStart?.(chain);
@@ -100,7 +111,7 @@ export const runWorkflow = async (
     try {
       const command = buildCommandForChain(chain);
 
-      const process = await spawnProcess("sh", ["-c", command]);
+      const process = await spawnProcess("sh", ["-c", command], { env });
 
       process.output.pipeTo(
         new WritableStream({

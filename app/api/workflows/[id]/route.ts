@@ -34,6 +34,7 @@ const UpdateWorkflowBodySchema = z.object({
   description: z.string().optional(),
   nodes: z.array(z.any()),
   edges: z.array(z.any()),
+  apiKeys: z.record(z.string(), z.string()).optional(),
 });
 
 /**

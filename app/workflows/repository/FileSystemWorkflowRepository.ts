@@ -15,6 +15,7 @@ const WorkflowDataSchema = z.object({
   nodes: z.array(z.any()), // Using z.any() for now, can be tightened later if needed
   edges: z.array(z.any()),
   lastModified: z.string().optional(),
+  apiKeys: z.record(z.string(), z.string()).optional(),
 });
 
 // Export the inferred TypeScript type for use in other parts of the application.
@@ -88,7 +89,13 @@ export class FileSystemWorkflowRepository {
    */
   async saveWorkflow(
     id: string,
-    data: { name: string; description?: string; nodes: Node[]; edges: Edge[] }
+    data: {
+      name: string;
+      description?: string;
+      nodes: Node[];
+      edges: Edge[];
+      apiKeys?: Record<string, string>;
+    }
   ): Promise<WorkflowData> {
     await this.ensureDirectoryExists();
     const filePath = path.join(WORKFLOWS_DIR, `${id}.json`);
@@ -97,6 +104,7 @@ export class FileSystemWorkflowRepository {
       ...data,
       id,
       lastModified: new Date().toISOString(),
+      apiKeys: data.apiKeys ?? {},
     };
 
     // Validate the data before writing it to disk to prevent corruption.

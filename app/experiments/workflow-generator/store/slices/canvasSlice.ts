@@ -5,7 +5,6 @@ import {
   type Connection,
   type Edge,
   type EdgeChange,
-  type Node,
   type NodeChange,
 } from "@xyflow/react";
 import type { StateCreator } from "zustand";

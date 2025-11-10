@@ -1,8 +1,13 @@
-import { WebContainer, type WebContainerProcess } from "@webcontainer/api";
+import {
+  WebContainer,
+  type WebContainerProcess,
+  type SpawnOptions,
+} from "@webcontainer/api";
 
 type SpawnCommand = {
   command: string;
   args?: string[];
+  options?: SpawnOptions;
 };
 
 class WebcontainerService {
@@ -18,9 +23,13 @@ class WebcontainerService {
     return this.instance;
   }
 
-  async spawn({ command, args = [] }: SpawnCommand): Promise<WebContainerProcess> {
+  async spawn({
+    command,
+    args = [],
+    options,
+  }: SpawnCommand): Promise<WebContainerProcess> {
     const runtime = await this.ensureInstance();
-    return runtime.spawn(command, args);
+    return runtime.spawn(command, args, options);
   }
 
   async teardown(): Promise<void> {
@@ -35,7 +44,10 @@ class WebcontainerService {
 const runtime = new WebcontainerService();
 
 export const ensureRuntimeReady = () => runtime.ensureInstance();
-export const spawnProcess = (command: string, args: string[] = []) =>
-  runtime.spawn({ command, args });
+export const spawnProcess = (
+  command: string,
+  args: string[] = [],
+  options?: SpawnOptions
+) => runtime.spawn({ command, args, options });
 export const teardownRuntime = () => runtime.teardown();
 

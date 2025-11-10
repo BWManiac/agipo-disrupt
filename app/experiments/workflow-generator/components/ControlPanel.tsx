@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 
 import type { WorkflowLayer } from "../store/slices/editorSlice";
+import { ApiKeyManager } from "./settings/ApiKeyManager";
 
 type ControlPanelProps = {
   onAdd: () => void;
@@ -68,6 +69,12 @@ export function ControlPanel({
         >
           {isInstalling ? "Installing..." : "Install"}
         </Button>
+      </div>
+
+      <Separator orientation="vertical" className="h-6" />
+
+      <div className="pointer-events-auto">
+        <ApiKeyManager />
       </div>
 
       <Separator orientation="vertical" className="h-6" />

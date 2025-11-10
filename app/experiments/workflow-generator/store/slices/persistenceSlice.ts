@@ -1,8 +1,8 @@
-import { nanoid } from "nanoid";
 import { type StateCreator } from "zustand";
 
 import type { WorkflowData } from "@/app/workflows/repository/FileSystemWorkflowRepository";
-import type { WorkflowGeneratorStore } from "../types";
+import type { WorkflowGeneratorStore, WorkflowNode, ApiKeyMap } from "../types";
+import type { Edge } from "@xyflow/react";
 
 // 1. State Interface
 export interface PersistenceSliceState {
@@ -52,6 +52,7 @@ export const createPersistenceSlice: StateCreator<
   resetWorkflowState: () => {
     set(initialState);
     get().resetCanvas();
+    get().clearAllApiKeys();
   },
 
   loadCompleteWorkflow: (data: WorkflowData) => {
@@ -59,12 +60,17 @@ export const createPersistenceSlice: StateCreator<
       workflowName: data.name || "",
       currentWorkflowId: data.id,
     });
-    get().loadNodesAndEdges(data.nodes as any, data.edges as any);
+    get().loadNodesAndEdges(
+      data.nodes as WorkflowNode[],
+      data.edges as Edge[]
+    );
+    const keys: ApiKeyMap = data.apiKeys ? { ...data.apiKeys } : {};
+    get().replaceApiKeys(keys);
   },
 
   saveCurrentWorkflow: async () => {
     set({ isSaving: true });
-    const { nodes, edges, workflowName, currentWorkflowId } = get();
+    const { nodes, edges, workflowName, currentWorkflowId, apiKeys } = get();
 
     if (!workflowName) {
       alert("Please enter a name for the workflow before saving.");
@@ -80,6 +86,7 @@ export const createPersistenceSlice: StateCreator<
       description: "Workflow saved from the editor.",
       nodes,
       edges,
+      apiKeys,
     };
 
     try {
