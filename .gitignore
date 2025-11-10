@@ -23,6 +23,7 @@
 # misc
 .DS_Store
 *.pem
+/_workflows/
 
 # debug
 npm-debug.log*

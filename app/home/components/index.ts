@@ -3,6 +3,7 @@ export * from "./MetricsOverview";
 export * from "./KanbanBoard";
 export * from "./PromptPanel";
 export * from "./ActivityPanel";
+export * from "./AgentQuickChat";
 export * from "./MarketplaceSpotlight";
 export * from "./CollaborationBar";
 export * from "./FooterSection";

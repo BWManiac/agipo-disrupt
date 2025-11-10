@@ -31,6 +31,13 @@ export type ActivityItem = {
   showPulse?: boolean;
 };
 
+export type QuickChatMessage = {
+  id: string;
+  author: "user" | "agent";
+  content: string;
+  timestamp: string;
+};
+
 export type MarketplaceAgent = {
   id: string;
   title: string;
@@ -268,4 +275,27 @@ export const collaborators: Collaborator[] = [
   { id: "collab-1", initials: "JD", name: "Jordan Diaz" },
   { id: "collab-2", initials: "SM", name: "Sasha Malik" },
   { id: "collab-3", initials: "AK", name: "Aria Kim" },
+];
+
+export const quickChatMessages: QuickChatMessage[] = [
+  {
+    id: "chat-1",
+    author: "agent",
+    content:
+      "Morning! I've finished cleaning the support backlog. Do you want me to triage the new tickets that arrived overnight?",
+    timestamp: "2 minutes ago",
+  },
+  {
+    id: "chat-2",
+    author: "user",
+    content: "Yes, please prioritize anything marked urgent and flag billing issues.",
+    timestamp: "1 minute ago",
+  },
+  {
+    id: "chat-3",
+    author: "agent",
+    content:
+      "Got it. I'll hand off a summary once the triage run completes — expect it in ~10 minutes.",
+    timestamp: "Just now",
+  },
 ];

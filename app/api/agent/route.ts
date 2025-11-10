@@ -33,7 +33,7 @@ if (process.env.AI_GATEWAY_API_KEY) {
 
 const chatAgent = new Agent({
   // Gemini 2.5 Flash via AI Gateway (https://vercel.com/ai-gateway/models/gemini-2.5-flash)
-  model: "google/gemini-2.5-flash",
+  model: "google/gemini-2.5-pro",
   system:
     "You are the Workflow Generator assistant. Answer succinctly. Do not attempt to change the canvas directly; you will later call tools to propose edits.",
   tools: workflowTools,
