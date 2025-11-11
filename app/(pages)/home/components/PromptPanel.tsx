@@ -11,30 +11,30 @@ const suggestedPrompts = [
 
 export function PromptPanel() {
   return (
-    <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 text-white shadow-lg">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.2),_rgba(255,255,255,0))]" />
-      <CardHeader className="relative z-10">
-        <CardTitle className="text-2xl font-semibold">Create an agent</CardTitle>
-        <CardDescription className="text-sm text-white/70">
+    <Card className="rounded-2xl border border-border bg-background shadow-sm">
+      <CardHeader>
+        <CardTitle className="text-lg font-semibold text-foreground">Create an agent</CardTitle>
+        <CardDescription className="text-sm text-muted-foreground">
           Describe the agent you need in plain English
         </CardDescription>
       </CardHeader>
-      <CardContent className="relative z-10 flex flex-col gap-4">
+      <CardContent className="flex flex-col gap-4">
         <Input
           placeholder="Describe the agent you need…"
-          className="border-white/20 bg-white/95 text-base text-slate-900 placeholder:text-slate-500 focus-visible:ring-white"
+          className="border-border/50 text-sm"
         />
         <div className="flex flex-wrap gap-2">
           {suggestedPrompts.map((prompt) => (
             <Badge
               key={prompt}
-              className="border-white/30 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 transition hover:bg-white/20"
+              variant="secondary"
+              className="rounded-full border-border bg-muted/40 px-3 py-1 text-xs font-medium text-muted-foreground"
             >
               {prompt}
             </Badge>
           ))}
         </div>
-        <Button variant="link" className="self-start px-0 text-sm text-white/90">
+        <Button variant="link" className="self-start px-0 text-sm font-semibold text-foreground">
           See how it works →
         </Button>
       </CardContent>

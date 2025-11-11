@@ -7,11 +7,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function FilterSidebar() {
   return (
-    <Card className="sticky top-6 h-fit rounded-3xl border-border/80 bg-white shadow-sm">
-      <CardHeader className="border-b border-border/70 pb-4">
+    <Card className="sticky top-6 h-fit rounded-2xl border border-border bg-background shadow-sm">
+      <CardHeader className="border-b border-border/80 pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-semibold text-slate-900">Filters</CardTitle>
-          <Button variant="link" className="p-0 text-xs text-primary">
+          <CardTitle className="text-base font-semibold text-foreground">Filters</CardTitle>
+          <Button variant="link" className="p-0 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             Clear all
           </Button>
         </div>

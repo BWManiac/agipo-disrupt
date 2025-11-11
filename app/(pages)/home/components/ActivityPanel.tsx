@@ -8,9 +8,9 @@ const filters = ["All", "Success", "Errors", "Alerts"];
 
 export function ActivityPanel() {
   return (
-    <Card className="border border-border/80 bg-white">
+    <Card className="rounded-2xl border border-border bg-background shadow-sm">
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-semibold text-slate-900">
+        <CardTitle className="text-lg font-semibold text-foreground">
           Live Activity
         </CardTitle>
       </CardHeader>
@@ -19,12 +19,11 @@ export function ActivityPanel() {
           {filters.map((filter) => (
             <Badge
               key={filter}
-              variant={filter === "All" ? "default" : "secondary"}
               className={cn(
-                "cursor-pointer rounded-full px-3 py-1 text-xs font-semibold",
+                "cursor-pointer rounded-full border px-3 py-1 text-xs font-semibold",
                 filter === "All"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-slate-100 text-muted-foreground border-border"
+                  ? "border-primary/40 bg-primary/10 text-primary"
+                  : "border-border bg-muted/40 text-muted-foreground"
               )}
             >
               {filter}
@@ -53,7 +52,7 @@ function ActivityItem({
   return (
     <div
       className={cn(
-        "rounded-lg border border-border/70 bg-slate-50/80 p-3 text-sm shadow-sm",
+        "rounded-lg border border-border/70 bg-muted/30 p-3 text-sm shadow-sm",
         type === "success" && "border-l-4 border-l-emerald-500",
         type === "warning" && "border-l-4 border-l-amber-500",
         type === "error" && "border-l-4 border-l-rose-500"

@@ -5,30 +5,38 @@ import { Button } from "@/components/ui/button";
 
 export function MarketplaceSpotlight() {
   return (
-    <section className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-12 md:px-8 lg:px-12 xl:px-24">
-      <header className="flex items-center justify-between gap-4">
-        <div className="flex flex-col">
-          <h2 className="text-2xl font-semibold text-slate-900">Marketplace Spotlight</h2>
-          <p className="text-sm text-muted-foreground">
-            Featured agents the community is hiring this week.
-          </p>
+    <section className="rounded-2xl border border-border bg-background p-6 shadow-sm">
+      <header className="flex flex-wrap items-center justify-between gap-4">
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold text-foreground">Marketplace Spotlight</h2>
+          <p className="text-sm text-muted-foreground">Featured agents the community is hiring this week.</p>
         </div>
-        <Button variant="outline" className="hidden border-border/70 text-sm text-muted-foreground hover:border-primary/50 hover:text-primary sm:inline-flex">
+        <Button
+          variant="outline"
+          className="hidden rounded-full border-border px-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground hover:border-foreground/40 hover:text-foreground sm:inline-flex"
+        >
           View all →
         </Button>
       </header>
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {marketplaceAgents.map((agent) => (
-          <Card key={agent.id} className="group border border-border/80 bg-white transition hover:border-primary/50 hover:shadow-lg">
+          <Card
+            key={agent.id}
+            className="group rounded-xl border border-border bg-card transition hover:border-foreground/30 hover:shadow-lg"
+          >
             <CardHeader className="gap-3 pb-2">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 {agent.tags.map((tag) => (
-                  <Badge key={tag} variant="secondary" className="border-border/70 bg-slate-100 text-xs font-medium text-muted-foreground">
+                  <Badge
+                    key={tag}
+                    variant="secondary"
+                    className="rounded-full border-border bg-muted/40 text-xs font-medium text-muted-foreground"
+                  >
                     {tag}
                   </Badge>
                 ))}
               </div>
-              <CardTitle className="text-lg font-semibold text-slate-900">
+              <CardTitle className="text-base font-semibold text-foreground">
                 {agent.title}
               </CardTitle>
             </CardHeader>
@@ -36,10 +44,10 @@ export function MarketplaceSpotlight() {
               <p className="text-muted-foreground">{agent.description}</p>
               <div className="flex items-center gap-2 text-sm font-medium text-slate-900">
                 <span className="text-amber-500">{ratingStars(agent.rating)}</span>
-                <span>{agent.rating.toFixed(1)}</span>
+                <span className="text-foreground">{agent.rating.toFixed(1)}</span>
                 <span className="text-muted-foreground">• {agent.usage}</span>
               </div>
-              <Button size="sm" className="w-full">
+              <Button size="sm" className="w-full rounded-full">
                 Add to workspace
               </Button>
             </CardContent>

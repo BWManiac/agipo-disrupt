@@ -2,13 +2,17 @@ import { metrics } from "../data/mock-data";
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-export function MetricsOverview() {
+type MetricsOverviewProps = {
+  className?: string;
+};
+
+export function MetricsOverview({ className }: MetricsOverviewProps) {
   return (
-    <section className="mx-auto grid max-w-6xl gap-4 px-6 py-8 md:px-8 lg:grid-cols-4 lg:px-12 xl:px-24">
+    <div className={cn("grid gap-4 md:grid-cols-2 xl:grid-cols-4", className)}>
       {metrics.map((metric) => (
         <MetricCard key={metric.id} metric={metric} />
       ))}
-    </section>
+    </div>
   );
 }
 
@@ -18,12 +22,12 @@ function MetricCard({
   metric: (typeof metrics)[number];
 }) {
   return (
-    <Card className="border border-border/80 bg-white shadow-sm transition hover:shadow-md">
-      <CardContent className="flex flex-col gap-4">
-        <CardDescription className="text-xs font-semibold uppercase tracking-[0.25em] text-muted-foreground">
+    <Card className="border border-border bg-card shadow-sm transition hover:border-foreground/20 hover:shadow-md">
+      <CardContent className="flex flex-col gap-4 p-5">
+        <CardDescription className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
           {metric.label}
         </CardDescription>
-        <CardTitle className="text-3xl font-bold text-slate-900">
+        <CardTitle className="text-2xl font-semibold text-foreground">
           {metric.value}
         </CardTitle>
         <span

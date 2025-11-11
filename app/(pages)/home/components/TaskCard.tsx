@@ -14,15 +14,15 @@ const statusCopy: Record<Task["status"], string> = {
 
 export function TaskCard({ task }: { task: Task }) {
   return (
-    <Card className="group border-border/70 bg-slate-50/80 transition hover:border-primary/50 hover:shadow-md">
+    <Card className="group rounded-lg border border-border bg-muted/40 transition hover:border-foreground/30 hover:shadow-md">
       <CardContent className="flex flex-col gap-3 p-4">
         <div className="flex items-center gap-3">
-          <Avatar className="size-9 border border-border/60 bg-gradient-to-br from-blue-500 to-indigo-500 text-white">
+          <Avatar className="size-9 border border-border/60 bg-primary/10 text-primary">
             <AvatarFallback className="bg-transparent text-xs font-semibold uppercase tracking-wide">
               {task.agentInitials}
             </AvatarFallback>
           </Avatar>
-          <div className="flex flex-col text-sm font-medium text-slate-900">
+          <div className="flex flex-col text-sm font-semibold text-foreground">
             {task.title}
           </div>
         </div>

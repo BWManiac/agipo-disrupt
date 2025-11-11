@@ -52,7 +52,7 @@ export function ChatWidget() {
     <div className="fixed bottom-6 right-6 z-50">
       <Button
         size="icon-lg"
-        className="rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 text-2xl shadow-lg"
+        className="rounded-full bg-primary text-2xl text-primary-foreground shadow-lg"
         onClick={() => setOpen(true)}
       >
         💬

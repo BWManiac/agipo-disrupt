@@ -3,11 +3,21 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { MetricsOverview } from "./MetricsOverview";
 import { rotatingMessages, heroTrustCopy } from "../data/mock-data";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 const ROTATION_INTERVAL = 3000;
+const actions = [
+  { href: "/experiments/workflow-generator", label: "Create an agent", variant: "default" as const },
+  { href: "/marketplace", label: "Browse marketplace", variant: "outline" as const },
+  { href: "/workflows", label: "View my workflows", variant: "outline" as const },
+  { href: "/workforce", label: "Manage workforce", variant: "outline" as const },
+  { href: "/profile", label: "Open profile", variant: "ghost" as const },
+];
 
 export function HeroSection() {
   const [messageIndex, setMessageIndex] = useState(0);
@@ -21,43 +31,54 @@ export function HeroSection() {
   }, []);
 
   return (
-    <section className="border-b border-border bg-gradient-to-br from-slate-50 via-white to-white px-6 py-16 md:px-8 lg:px-12 xl:px-24">
-      <div className="mx-auto flex max-w-6xl flex-col items-center text-center">
-        <p className="mb-3 inline-flex rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
-          Agent Marketplace &amp; Orchestration
-        </p>
-        <h1 className="bg-gradient-to-r from-slate-900 via-slate-900 to-blue-600 bg-clip-text text-4xl font-extrabold tracking-tight text-transparent sm:text-5xl lg:text-[3.5rem]">
-          Orchestrate your AI workforce.
-        </h1>
-        <p className="mt-4 max-w-2xl text-lg text-muted-foreground md:text-xl">
-          Create, deploy, and manage multiple AI agents through natural language. Build
-          transparent, scannable automations that run entirely in your browser.
-        </p>
-        <div className="mt-6 min-h-[1.5rem] text-sm font-medium text-muted-foreground/80">
-          {rotatingMessages[messageIndex]}
+    <section className="rounded-2xl border border-border bg-background px-6 py-8 shadow-sm">
+      <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="space-y-4">
+            <Badge variant="outline" className="uppercase tracking-[0.24em] text-xs">
+              Operating Hub
+            </Badge>
+            <div className="space-y-3">
+              <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+                Orchestrate your AI workforce
+              </h1>
+              <p className="max-w-2xl text-sm text-muted-foreground md:text-base">
+                Create, deploy, and manage multiple AI agents through natural language. Build
+                transparent, scannable automations that run entirely in your browser.
+              </p>
+            </div>
+            <div className="min-h-[1.5rem] text-sm font-medium text-muted-foreground">
+              {rotatingMessages[messageIndex]}
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-1 md:flex-nowrap">
+              {actions.map((action) => (
+                <Button
+                  key={action.href}
+                  size="lg"
+                  variant={action.variant}
+                  className={cn(
+                    "whitespace-nowrap rounded-full px-6",
+                    action.variant === "default"
+                      ? "shadow-sm"
+                      : "border-border text-muted-foreground hover:text-foreground"
+                  )}
+                  asChild
+                >
+                  <Link href={action.href}>{action.label}</Link>
+                </Button>
+              ))}
+            </div>
+          </div>
+          <div className="flex items-start gap-3 rounded-xl border border-border/80 bg-muted/40 p-4 text-left text-sm text-muted-foreground lg:max-w-sm">
+            <span className="text-2xl" aria-hidden>
+              ⚡
+            </span>
+            <p className="leading-relaxed">{heroTrustCopy}</p>
+          </div>
         </div>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Button size="lg" className="px-6 py-6 text-base" asChild>
-            <Link href="/experiments/workflow-generator">Create an agent</Link>
-          </Button>
-          <Button size="lg" className="px-6 py-6 text-base" asChild>
-            <Link href="/marketplace">Browse marketplace</Link>
-          </Button>
-          <Button size="lg" className="px-6 py-6 text-base" asChild>
-            <Link href="/workflows">View my workflows</Link>
-          </Button>
-          <Button size="lg" className="px-6 py-6 text-base" variant="secondary" asChild>
-            <Link href="/profile">Open profile</Link>
-          </Button>
-        </div>
-        <p className="mt-4 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-          {heroTrustCopy}
-        </p>
+        <Separator />
+        <MetricsOverview />
       </div>
     </section>
   );
-}
-
-export function HeroSpacer({ className }: { className?: string }) {
-  return <div className={cn("h-4", className)} />;
 }

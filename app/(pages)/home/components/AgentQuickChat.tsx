@@ -11,13 +11,13 @@ const quickActions = ["Handoff summary", "Request update", "Pause agent"];
 
 export function AgentQuickChat() {
   return (
-    <Card className="border border-border/80 bg-white">
+    <Card className="rounded-2xl border border-border bg-background shadow-sm">
       <CardHeader className="gap-2 pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold text-slate-900">
+          <CardTitle className="text-lg font-semibold text-foreground">
             Quick Chat
           </CardTitle>
-          <Badge className="rounded-full bg-emerald-100 text-xs font-semibold text-emerald-700">
+          <Badge className="rounded-full bg-emerald-100 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
             Live
           </Badge>
         </div>
@@ -41,8 +41,8 @@ export function AgentQuickChat() {
           ))}
         </div>
       </CardContent>
-      <CardFooter className="flex items-center gap-2 border-t border-border/70 bg-slate-50/60 p-4">
-        <Input placeholder="Type a quick instruction…" className="flex-1 border-border/60" />
+      <CardFooter className="flex items-center gap-2 border-t border-border/70 bg-muted/40 p-4">
+        <Input placeholder="Type a quick instruction…" className="flex-1 border-border/50" />
         <Button size="sm">Send</Button>
       </CardFooter>
     </Card>
