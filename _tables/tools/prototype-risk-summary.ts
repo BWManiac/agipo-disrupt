@@ -1,17 +1,21 @@
 import { tool } from "ai";
 import { z } from "zod";
 
-export const summarizeRisksTool = tool({
+import type { ToolDefinition } from "../types";
+
+const run = tool({
   description:
     "Summarize a list of product risks and identify the one that deserves the most attention.",
   inputSchema: z.object({
-    risks: z.array(
-      z.object({
-        name: z.string(),
-        detail: z.string().optional(),
-        severity: z.enum(["low", "medium", "high"]).optional(),
-      }),
-    ).min(1, "Provide at least one risk to summarize."),
+    risks: z
+      .array(
+        z.object({
+          name: z.string(),
+          detail: z.string().optional(),
+          severity: z.enum(["low", "medium", "high"]).optional(),
+        }),
+      )
+      .min(1, "Provide at least one risk to summarize."),
   }),
   execute: async ({ risks }) => {
     console.log("[summarize_risks] invoked", { count: risks.length });
@@ -21,9 +25,9 @@ export const summarizeRisksTool = tool({
     const summary = risks
       .map(
         (risk, index) =>
-          `${index + 1}. ${risk.name}${risk.detail ? ` — ${risk.detail}` : ""}${
-            risk.severity ? ` (severity: ${risk.severity})` : ""
-          }`,
+          `${index + 1}. ${risk.name}${
+            risk.detail ? ` — ${risk.detail}` : ""
+          }${risk.severity ? ` (severity: ${risk.severity})` : ""}`,
       )
       .join("\n");
 
@@ -38,4 +42,11 @@ export const summarizeRisksTool = tool({
   },
 });
 
-
+export const summarizeRisksTool: ToolDefinition = {
+  id: "summarize_risks",
+  name: "Summarize Risks",
+  description:
+    "Summarize a list of product risks and identify the one that deserves the most attention.",
+  runtime: "internal",
+  run,
+};

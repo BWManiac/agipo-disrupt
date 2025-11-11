@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { agents, type AgentRecord } from "../data/mock-data";
+import { agents as registryAgents } from "@/_tables/agents";
+import type { AgentConfig } from "@/_tables/types";
 import { AgentModal } from "./AgentModal";
 
-const statusStyles: Record<AgentRecord["status"], string> = {
+const statusStyles: Record<AgentConfig["status"], string> = {
   active: "bg-emerald-100 text-emerald-700 border border-emerald-200",
   paused: "bg-slate-100 text-slate-600 border border-slate-200",
   attention: "bg-amber-100 text-amber-700 border border-amber-200",
@@ -19,14 +20,14 @@ const statusStyles: Record<AgentRecord["status"], string> = {
 export function WorkforceDashboard() {
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const selectedAgent = useMemo(
-    () => agents.find((agent) => agent.id === selectedAgentId) ?? null,
+    () => registryAgents.find((agent) => agent.id === selectedAgentId) ?? null,
     [selectedAgentId]
   );
 
   const metrics = [
     {
       label: "Agents hired",
-      value: `${agents.length}`,
+      value: `${registryAgents.length}`,
       helper: "+1 recommendation",
     },
     {
@@ -41,7 +42,7 @@ export function WorkforceDashboard() {
     },
   ];
 
-  const attentionAgents = agents.filter((agent) => agent.status !== "active");
+  const attentionAgents = registryAgents.filter((agent) => agent.status !== "active");
 
   return (
     <div className="space-y-8">
@@ -96,7 +97,7 @@ export function WorkforceDashboard() {
           </div>
         </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {agents.map((agent) => (
+          {registryAgents.map((agent) => (
             <button
               key={agent.id}
               onClick={() => setSelectedAgentId(agent.id)}

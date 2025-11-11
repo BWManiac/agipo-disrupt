@@ -4,7 +4,7 @@ import { stakeholderPulseTool } from "./stakeholder-pulse";
 import { funnelWatchTool } from "./funnel-watch";
 import { briefWriterTool } from "./brief-writer";
 import { sentimentRouterTool } from "./sentiment-router";
-export { summarizeRisksTool } from "./prototype-risk-summary";
+import { summarizeRisksTool } from "./prototype-risk-summary";
 
 export const tools = [
   requirementsDigestTool,
@@ -13,8 +13,11 @@ export const tools = [
   funnelWatchTool,
   briefWriterTool,
   sentimentRouterTool,
+  summarizeRisksTool,
 ];
 
 export function getToolById(id: string) {
   return tools.find((tool) => tool.id === id);
 }
+
+export { summarizeRisksTool };

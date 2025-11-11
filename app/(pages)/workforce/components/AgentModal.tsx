@@ -7,13 +7,13 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { AgentRecord } from "../data/mock-data";
-
+import type { AgentConfig } from "@/_tables/types";
+import { getToolById } from "@/_tables/tools";
 import { AgentChat } from "./AgentChat";
 import { ToolInspector } from "./ToolInspector";
 
 export type AgentModalProps = {
-  agent: AgentRecord | null;
+  agent: AgentConfig | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
@@ -22,11 +22,14 @@ export function AgentModal({ agent, open, onOpenChange }: AgentModalProps) {
   const [feedback, setFeedback] = useState("");
   const [queuedPrompt, setQueuedPrompt] = useState<string | null>(null);
   const [toolOpen, setToolOpen] = useState(false);
-  const [selectedToolIndex, setSelectedToolIndex] = useState<number | null>(null);
+  const [selectedToolId, setSelectedToolId] = useState<string | null>(null);
 
   if (!agent) {
     return null;
   }
+
+  const tools = agent.toolIds.map((id) => getToolById(id)).filter((t): t is NonNullable<typeof t> => t !== undefined);
+  const selectedTool = selectedToolId ? getToolById(selectedToolId) : null;
 
   const handleFeedbackSubmit = () => {
     if (!feedback.trim()) return;
@@ -103,12 +106,12 @@ export function AgentModal({ agent, open, onOpenChange }: AgentModalProps) {
                   Tool usage
                 </h3>
                 <div className="grid gap-3">
-                  {agent.tools.map((tool, idx) => (
-                    <div key={tool.name} className="rounded-xl border border-border bg-background p-4">
+                  {tools.map((tool) => (
+                    <div key={tool.id} className="rounded-xl border border-border bg-background p-4">
                       <button
                         className="flex w-full items-start justify-between gap-4 text-left"
                         onClick={() => {
-                          setSelectedToolIndex(idx);
+                          setSelectedToolId(tool.id);
                           setToolOpen(true);
                         }}
                       >
@@ -119,8 +122,8 @@ export function AgentModal({ agent, open, onOpenChange }: AgentModalProps) {
                           <p className="text-sm text-muted-foreground">{tool.description}</p>
                         </div>
                         <div className="text-right text-xs text-muted-foreground">
-                          <div>{tool.lastCalled}</div>
-                          <div>Success rate: {tool.successRate}</div>
+                          <div>—</div>
+                          <div>—</div>
                         </div>
                       </button>
                     </div>
@@ -194,12 +197,12 @@ export function AgentModal({ agent, open, onOpenChange }: AgentModalProps) {
           </div>
         </div>
         <ToolInspector
-          tool={selectedToolIndex !== null ? agent.tools[selectedToolIndex] : null}
+          tool={selectedTool}
           open={toolOpen}
           onOpenChange={(open) => {
             setToolOpen(open);
             if (!open) {
-              setSelectedToolIndex(null);
+              setSelectedToolId(null);
             }
           }}
         />
@@ -224,3 +227,5 @@ function Section({ heading, items }: { heading: string; items: string[] }) {
     </div>
   );
 }
+
+

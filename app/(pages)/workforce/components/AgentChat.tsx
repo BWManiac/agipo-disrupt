@@ -36,16 +36,16 @@ export function AgentChat({
       new DefaultChatTransport({
         api: "/api/workforce/agent",
         prepareSendMessagesRequest: async ({ id, messages, body, trigger, messageId }) => ({
-          body: {
+    body: {
             ...(body ?? {}),
             id,
             messages,
             trigger,
             messageId,
             agentId,
-            agentName,
-            context: defaultPrompt,
-          },
+      agentName,
+      context: defaultPrompt,
+    },
         }),
       }),
     [agentId, agentName, defaultPrompt]

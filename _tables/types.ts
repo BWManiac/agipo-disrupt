@@ -1,3 +1,5 @@
+import type { Tool } from "ai";
+
 export type AgentStatus = "active" | "paused" | "attention";
 
 export type AgentConfig = {
@@ -23,14 +25,10 @@ export type AgentConfig = {
   feedback: Array<{ author: string; comment: string; timestamp: string }>;
 };
 
-export type ToolConfig = {
+export type ToolDefinition = {
   id: string;
   name: string;
   description: string;
-  runtime: "webcontainer" | "internal" | "http" | string;
-  execute: (payload: { request?: string; context?: string }) => Promise<{
-    message: string;
-    summary: string;
-    runtime: string;
-  }>;
+  runtime?: "webcontainer" | "internal" | "http" | string;
+  run: Tool<unknown, unknown>;
 };
