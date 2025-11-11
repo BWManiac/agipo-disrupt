@@ -41,15 +41,15 @@ export function HeroSection() {
             <div className="space-y-3">
               <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
                 Orchestrate your AI workforce
-              </h1>
+        </h1>
               <p className="max-w-2xl text-sm text-muted-foreground md:text-base">
-                Create, deploy, and manage multiple AI agents through natural language. Build
-                transparent, scannable automations that run entirely in your browser.
-              </p>
+          Create, deploy, and manage multiple AI agents through natural language. Build
+          transparent, scannable automations that run entirely in your browser.
+        </p>
             </div>
             <div className="min-h-[1.5rem] text-sm font-medium text-muted-foreground">
-              {rotatingMessages[messageIndex]}
-            </div>
+          {rotatingMessages[messageIndex]}
+        </div>
             <div className="flex gap-3 overflow-x-auto pb-1 md:flex-nowrap">
               {actions.map((action) => (
                 <Button
@@ -65,7 +65,7 @@ export function HeroSection() {
                   asChild
                 >
                   <Link href={action.href}>{action.label}</Link>
-                </Button>
+          </Button>
               ))}
             </div>
           </div>
