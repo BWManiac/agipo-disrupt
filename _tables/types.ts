@@ -12,6 +12,7 @@ export type AgentConfig = {
   systemPrompt: string;
   model: string;
   toolIds: string[];
+  maxSteps?: number; // Optional: controls stopWhen for agent loop
   quickPrompts: string[];
   objectives: string[];
   guardrails: string[];

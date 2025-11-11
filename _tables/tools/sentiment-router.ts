@@ -17,12 +17,12 @@ export const sentimentRouterTool: ToolDefinition = {
     description: "Route tickets based on tone, urgency, and escalation matrix rules.",
     inputSchema,
     execute: async ({ request, context }) => {
-      const summary = request ?? context ?? "ticket triage";
-      return {
-        message: "Routed 58 tickets; escalated 3 high-risk items.",
-        summary,
-        runtime: "internal",
-      };
-    },
+    const summary = request ?? context ?? "ticket triage";
+    return {
+      message: "Routed 58 tickets; escalated 3 high-risk items.",
+      summary,
+      runtime: "internal",
+    };
+  },
   }),
 };

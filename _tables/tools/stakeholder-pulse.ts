@@ -17,12 +17,12 @@ export const stakeholderPulseTool: ToolDefinition = {
     description: "Summarise stakeholder sentiment and extract action items.",
     inputSchema,
     execute: async ({ request, context }) => {
-      const summary = request ?? context ?? "stakeholder update";
-      return {
-        message: "Summarised stakeholder sentiment into 4 action items.",
-        summary,
-        runtime: "webcontainer",
-      };
-    },
+    const summary = request ?? context ?? "stakeholder update";
+    return {
+      message: "Summarised stakeholder sentiment into 4 action items.",
+      summary,
+      runtime: "webcontainer",
+    };
+  },
   }),
 };

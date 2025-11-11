@@ -17,12 +17,12 @@ export const briefWriterTool: ToolDefinition = {
     description: "Draft a campaign brief aligned to current goals and guardrails.",
     inputSchema,
     execute: async ({ request, context }) => {
-      const summary = request ?? context ?? "campaign brief";
-      return {
-        message: "Drafted brief outline with objectives, audience, and CTA.",
-        summary,
-        runtime: "internal",
-      };
-    },
+    const summary = request ?? context ?? "campaign brief";
+    return {
+      message: "Drafted brief outline with objectives, audience, and CTA.",
+      summary,
+      runtime: "internal",
+    };
+  },
   }),
 };

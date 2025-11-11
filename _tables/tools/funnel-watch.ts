@@ -17,12 +17,12 @@ export const funnelWatchTool: ToolDefinition = {
     description: "Detect anomalies across the activation funnel compared to baselines.",
     inputSchema,
     execute: async ({ request, context }) => {
-      const summary = request ?? context ?? "funnel anomaly check";
-      return {
-        message: "No anomalies detected; CPC stable within 3%.",
-        summary,
-        runtime: "internal",
-      };
-    },
+    const summary = request ?? context ?? "funnel anomaly check";
+    return {
+      message: "No anomalies detected; CPC stable within 3%.",
+      summary,
+      runtime: "internal",
+    };
+  },
   }),
 };

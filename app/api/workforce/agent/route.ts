@@ -5,23 +5,15 @@ import {
   type Tool,
 } from "ai";
 import { NextResponse } from "next/server";
-import { summarizeRisksTool } from "@/_tables/tools/prototype-risk-summary";
+import { getAgentById } from "@/_tables/agents";
+import { getToolById } from "@/_tables/tools";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
-const workforceChatAgent = new Agent({
-  model: "google/gemini-2.5-flash",
-  system:
-    "You are a concise, helpful teammate. When the user lists product risks, call the summarize_risks tool to structure them before you respond.",
-  tools: {
-    summarize_risks: summarizeRisksTool,
-  },
-  stopWhen: stepCountIs(3),
-});
-
 type IncomingPayload = {
   messages?: unknown;
+  agentId?: string;
   agentName?: string;
   context?: string;
 };
@@ -29,40 +21,51 @@ type IncomingPayload = {
 export async function POST(request: Request) {
   try {
     const payload = (await request.json()) as IncomingPayload;
-    const { messages, agentName, context } = payload;
+    const { messages, agentId, context } = payload;
 
     if (!messages) {
       return NextResponse.json({ message: "Missing messages array." }, { status: 400 });
     }
 
-    // No tools for this spike; provide an empty validation map.
-    const toolValidationMap = {
-      summarize_risks: summarizeRisksTool,
-    } as Record<string, Tool<unknown, unknown>>;
+    // Load agent from registry; default to Mira if not specified.
+    const requestedAgentId = agentId ?? "pm";
+    const agent = getAgentById(requestedAgentId);
+    
+    if (!agent) {
+      console.error(`[workforce/agent] Agent not found: ${requestedAgentId}`);
+      return NextResponse.json({ message: "Agent not found" }, { status: 404 });
+    }
 
-    type AgentMessage = Parameters<
-      typeof workforceChatAgent.respond
-    >[0]["messages"][number];
-    const validated = await validateUIMessages<AgentMessage>({
-      messages,
-      tools: toolValidationMap,
+    console.log(`[workforce/agent] Loading agent: ${requestedAgentId}`);
+    console.log(`[workforce/agent] Model: ${agent.model}, ToolIds: [${agent.toolIds.join(", ")}]`);
+
+    // Build tool map dynamically from agent's toolIds.
+    const toolMap: Record<string, Tool<unknown, unknown>> = {};
+    for (const toolId of agent.toolIds) {
+      const toolDef = getToolById(toolId);
+      if (!toolDef) {
+        console.warn(`[workforce/agent] Tool not found: ${toolId}; skipping.`);
+        continue;
+      }
+      toolMap[toolId] = toolDef.run;
+    }
+
+    // Instantiate agent dynamically with registry config.
+    const dynamicAgent = new Agent({
+      model: agent.model,
+      system: agent.systemPrompt,
+      tools: toolMap,
+      stopWhen: stepCountIs(agent.maxSteps ?? 3),
     });
 
-    // Prepend persona and optional context as system messages (system-first).
+    type AgentMessage = Parameters<typeof dynamicAgent.respond>[0]["messages"][number];
+    const validated = await validateUIMessages<AgentMessage>({
+      messages,
+      tools: toolMap,
+    });
+
+    // Optionally prepend additional context as a system message.
     const augmented: AgentMessage[] = [
-      ...(agentName
-        ? ([
-            {
-              role: "system",
-              parts: [
-                {
-                  type: "text",
-                  text: `You are ${agentName}, an AI Product Manager embedded with the team. Respond succinctly, highlight risks/opportunities, and ask clarifying questions when needed.`,
-                },
-              ],
-            } as AgentMessage,
-          ] as AgentMessage[])
-        : []),
       ...(context
         ? ([
             {
@@ -79,14 +82,14 @@ export async function POST(request: Request) {
       ...validated,
     ];
 
-    // Basic observability in dev.
-    console.log("[/api/workforce/agent] messages:", Array.isArray(validated) ? validated.length : 0);
-
-    const response = await workforceChatAgent.respond({ messages: augmented });
-    console.log("[/api/workforce/agent] response sent");
+    console.log("[workforce/agent] messages:", validated.length);
+    console.log(`[workforce/agent] Tools available: ${Object.keys(toolMap).length > 0 ? Object.keys(toolMap).join(", ") : "none"}`);
+    
+    const response = await dynamicAgent.respond({ messages: augmented });
+    console.log("[workforce/agent] response sent");
     return response;
   } catch (error) {
-    console.error("[/api/workforce/agent] error:", error);
+    console.error("[workforce/agent] error:", error);
     return NextResponse.json({ message: "Agent failed to respond." }, { status: 500 });
   }
 }

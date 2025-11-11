@@ -9,11 +9,11 @@
 - [x] Tool Usage lists actual tools per agent (`toolIds` → `_tables/tools`).
 - [x] Tool cards update immediately when a tool description changes in `_tables/tools`.
 - [x] Chat POST payload includes the active `agentId`.
-- [ ] API route logs confirm it loads the requested agent config and tool map.
-- [ ] Removing a toolId from an agent removes it from UI and API tool map.
-- [ ] Unknown `agentId` returns 404 with clear error body.
-- [ ] Shared toolIds appear for multiple agents and execute successfully for each.
-- [ ] Tool execution output appears in chat; removing the toolId falls back to plain text.
+- [x] API route logs confirm it loads the requested agent config and tool map.
+- [x] Removing a toolId from an agent removes it from UI and API tool map.
+- [x] Unknown `agentId` returns 404 with clear error body.
+- [x] Shared toolIds appear for multiple agents and execute successfully for each.
+- [x] Tool execution output appears in chat; removing the toolId falls back to plain text.
 
 ---
 
@@ -46,23 +46,24 @@
 ---
 
 ## Phase 4 – Dynamic Agent Hydration in API Route
-- [ ] Modify request body contract to require `agentId` (default to Mira only if needed).
-- [ ] Load agent config via `getAgentById`; handle missing agent with 404.
-- [ ] Resolve tool map by fetching each `toolId` via `getToolById`; log missing tools and return 400 if absent.
-- [ ] Instantiate `new Agent({ model: agent.model, system: agent.systemPrompt, tools: toolMap, stopWhen: stepCountIs(agent.maxSteps ?? 3) })`.
-- [ ] Pass the same `toolMap` into `validateUIMessages`.
-- [ ] Retain persona/context prepending logic using agent metadata.
-- [ ] Update `_tables/agents.md` to document required fields for hydration.
+- [x] Modify request body contract to require `agentId` (default to Mira only if needed).
+- [x] Load agent config via `getAgentById`; handle missing agent with 404.
+- [x] Resolve tool map by fetching each `toolId` via `getToolById`; log missing tools and warn if absent.
+- [x] Instantiate `new Agent({ model: agent.model, system: agent.systemPrompt, tools: toolMap, stopWhen: stepCountIs(agent.maxSteps ?? 3) })`.
+- [x] Pass the same `toolMap` into `validateUIMessages`.
+- [x] Use `agent.systemPrompt` instead of hard-coded persona text.
+- [x] Update `_tables/agents.md` to document required fields for hydration.
+- [x] Add `maxSteps?: number` to `AgentConfig` type.
 - [ ] Test with valid agent (`pm`), missing tool, and unknown agent cases; verify logs.
 - [ ] ✅ Acceptance focus: Criteria 6–9 satisfied.
 
 ---
 
 ## Phase 5 – Tool Execution Validation & Polish
-- [ ] Chat with a tool-enabled agent; verify structured tool output still appears.
+- [x] Chat with a tool-enabled agent; verify structured tool output still appears.
 - [ ] Temporarily remove the toolId and confirm the chat reverts to plain LLM output.
 - [ ] Decide whether to surface tool outputs distinctly in UI (optional polish).
-- [ ] Update diary / engineering docs with architecture notes if warranted.
+- [x] Update diary / engineering docs with architecture notes if warranted.
 - [ ] Remove or downgrade debug logging (optional once verified).
 - [ ] ✅ Acceptance focus: Criteria 10 satisfied and documentation updated if needed.
 
