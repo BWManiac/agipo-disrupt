@@ -4,11 +4,11 @@
 ---
 
 ## Acceptance Criteria (Validate Throughout)
-- [ ] Agent cards reflect registry data (`/workforce` shows one card per `_tables/agents`).
-- [ ] Agent modal shows real metadata (quick prompts, objectives, guardrails match agent file).
-- [ ] Tool Usage lists actual tools per agent (`toolIds` → `_tables/tools`).
-- [ ] Tool cards update immediately when a tool description changes in `_tables/tools`.
-- [ ] Chat POST payload includes the active `agentId`.
+- [x] Agent cards reflect registry data (`/workforce` shows one card per `_tables/agents`).
+- [x] Agent modal shows real metadata (quick prompts, objectives, guardrails match agent file).
+- [x] Tool Usage lists actual tools per agent (`toolIds` → `_tables/tools`).
+- [x] Tool cards update immediately when a tool description changes in `_tables/tools`.
+- [x] Chat POST payload includes the active `agentId`.
 - [ ] API route logs confirm it loads the requested agent config and tool map.
 - [ ] Removing a toolId from an agent removes it from UI and API tool map.
 - [ ] Unknown `agentId` returns 404 with clear error body.
@@ -29,19 +29,19 @@
 ## Phase 2 – Drive Workforce UI from Agent Registry
 - [x] Verify each `_tables/agents/*.ts` contains `model`, `systemPrompt`, `toolIds`, quick prompts, objectives, guardrails, insights, activities.
 - [x] Implement `_tables/agents/index.ts` exporting `agents` and `getAgentById`.
-- [x] Create adapter in `app/(pages)/workforce/data/` to map registry agents to card UI shape.
-- [x] Update `WorkforceDashboard.tsx` to consume adapter output instead of mock data.
-- [ ] Smoke test `/workforce`: cards count, names, roles, highlights match registry.
-- [ ] ✅ Acceptance focus: Criteria 1 & 2 satisfied.
+- [x] Delete `app/(pages)/workforce/data/mock-data.ts`; read directly from `_tables/agents`.
+- [x] Update `WorkforceDashboard.tsx` to consume registry agents.
+- [x] Smoke test `/workforce`: cards count, names, roles, highlights match registry.
+- [x] ✅ Acceptance focus: Criteria 1 & 2 satisfied.
 
 ---
 
 ## Phase 3 – Power Agent Modal Tool Usage from Registry
-- [ ] In `AgentModal.tsx`, replace hard-coded tool list with `agent.toolIds.map(getToolById)` (render name/description).
-- [ ] Ensure `ToolInspector` loads the same metadata (avoid stale props).
-- [ ] Confirm `AgentChat.tsx` body already sends `agentId`; adjust if necessary.
-- [ ] Refresh modal: Tool Usage updates when editing `_tables/tools` entries.
-- [ ] ✅ Acceptance focus: Criteria 3–5 satisfied (tool list & agentId payload).
+- [x] In `AgentModal.tsx`, replace hard-coded tool list with `agent.toolIds.map(getToolById)` (render name/description).
+- [x] Ensure `ToolInspector` loads the same metadata (avoid stale props).
+- [x] Confirm `AgentChat.tsx` body already sends `agentId`; adjust if necessary.
+- [x] Refresh modal: Tool Usage updates when editing `_tables/tools` entries.
+- [x] ✅ Acceptance focus: Criteria 3–5 satisfied (tool list & agentId payload).
 
 ---
 
