@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
 import type { UIMessage } from "ai";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -27,12 +28,31 @@ export function AgentChat({
   className?: string;
 }) {
   const [input, setInput] = useState("");
+  
+  console.log("[AgentChat] Mounting with:", { agentId, agentName, api: "/api/workforce/agent" });
+  
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: "/api/workforce/agent",
+        prepareSendMessagesRequest: async ({ id, messages, body, trigger, messageId }) => ({
+          body: {
+            ...(body ?? {}),
+            id,
+            messages,
+            trigger,
+            messageId,
+            agentId,
+            agentName,
+            context: defaultPrompt,
+          },
+        }),
+      }),
+    [agentId, agentName, defaultPrompt]
+  );
+  
   const { messages, sendMessage, status } = useChat({
-    api: `/api/agents/${agentId}`,
-    body: {
-      agentName,
-      context: defaultPrompt,
-    },
+    transport,
     initialMessages:
       defaultPrompt.trim().length > 0
         ? [
@@ -86,7 +106,7 @@ export function AgentChat({
 
   return (
     <div className={cn("flex h-full flex-col", className)}>
-      <ScrollArea className="flex-1 px-6 py-4">
+  <ScrollArea className="flex-1 min-h-0 px-6 py-4">
         <div className="space-y-3">
           {displayMessages.map((message) => {
             const text = textFromMessage(message);
