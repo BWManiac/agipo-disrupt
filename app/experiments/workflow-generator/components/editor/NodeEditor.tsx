@@ -5,8 +5,6 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { shallow } from "zustand/shallow";
-
 import { useWorkflowGeneratorStore } from "../../store";
 import type { WorkflowNode } from "../../store/types";
 import { ProcessStepItem } from "./spec/ProcessStepItem";

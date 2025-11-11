@@ -19,7 +19,7 @@ import type {
   ConnectNodesIntent,
   RepositionNodesIntent,
 } from "./toolIntents";
-import type { WorkflowNode, ContractField } from "../store/types";
+import type { WorkflowNode } from "../store/types";
 
 // Agent-created nodes still need unique IDs; this keeps them short and readable.
 const generateNodeId = () => Math.random().toString(36).slice(2, 6);

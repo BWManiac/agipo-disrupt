@@ -46,6 +46,9 @@ export function HeroSection() {
           <Button size="lg" className="px-6 py-6 text-base" asChild>
             <Link href="/workflows">View my workflows</Link>
           </Button>
+          <Button size="lg" className="px-6 py-6 text-base" variant="secondary" asChild>
+            <Link href="/profile">Open profile</Link>
+          </Button>
         </div>
         <p className="mt-4 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
           {heroTrustCopy}

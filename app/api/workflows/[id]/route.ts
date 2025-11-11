@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { FileSystemWorkflowRepository } from "@/app/workflows/repository/FileSystemWorkflowRepository";
+import { FileSystemWorkflowRepository } from "@/app/(pages)/workflows/repository/FileSystemWorkflowRepository";
 
 const repo = new FileSystemWorkflowRepository();
 

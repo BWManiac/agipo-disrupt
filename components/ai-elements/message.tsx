@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { FileUIPart, UIMessage } from "ai";
+import Image from "next/image";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -20,7 +21,15 @@ import {
   XIcon,
 } from "lucide-react";
 import type { ComponentProps, HTMLAttributes, ReactElement } from "react";
-import { createContext, memo, useContext, useEffect, useState } from "react";
+import {
+  Children,
+  createContext,
+  memo,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Streamdown } from "streamdown";
 
 export type MessageProps = HTMLAttributes<HTMLDivElement> & {
@@ -188,11 +197,18 @@ export const MessageBranchContent = ({
   ...props
 }: MessageBranchContentProps) => {
   const { currentBranch, setBranches, branches } = useMessageBranch();
-  const childrenArray = Array.isArray(children) ? children : [children];
+  const childrenArray = useMemo(
+    () => Children.toArray(children) as ReactElement[],
+    [children]
+  );
 
   // Use useEffect to update branches when they change
   useEffect(() => {
-    if (branches.length !== childrenArray.length) {
+    const hasDifferentLength = branches.length !== childrenArray.length;
+    const hasDifferentRefs = branches.some(
+      (branch, index) => branch !== childrenArray[index]
+    );
+    if (hasDifferentLength || hasDifferentRefs) {
       setBranches(childrenArray);
     }
   }, [childrenArray, branches, setBranches]);
@@ -203,7 +219,7 @@ export const MessageBranchContent = ({
         "grid gap-2 overflow-hidden [&>div]:pb-0",
         index === currentBranch ? "block" : "hidden"
       )}
-      key={branch.key}
+      key={branch.key ?? index}
       {...props}
     >
       {branch}
@@ -229,7 +245,11 @@ export const MessageBranchSelector = ({
 
   return (
     <ButtonGroup
-      className="[&>*:not(:first-child)]:rounded-l-md [&>*:not(:last-child)]:rounded-r-md"
+      className={cn(
+        "[&>*:not(:first-child)]:rounded-l-md [&>*:not(:last-child)]:rounded-r-md",
+        className
+      )}
+      data-from={from}
       orientation="horizontal"
       {...props}
     />
@@ -276,6 +296,7 @@ export const MessageBranchNext = ({
       size="icon-sm"
       type="button"
       variant="ghost"
+      className={className}
       {...props}
     >
       {children ?? <ChevronRightIcon size={14} />}
@@ -349,12 +370,12 @@ export function MessageAttachment({
     >
       {isImage ? (
         <>
-          <img
+          <Image
             alt={filename || "attachment"}
-            className="size-full object-cover"
-            height={100}
+            className="object-cover"
+            fill
+            sizes="96px"
             src={data.url}
-            width={100}
           />
           {onRemove && (
             <Button

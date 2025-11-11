@@ -12,8 +12,15 @@
 ## Founder Video
 
 ### Question: Please record a one minute video introducing the founder(s).
-**Answer:** (Script Outline)
-My name is Jacobson. I am a technical product manager with expertise in marketplaces and consumer products. In a past life, I was a product manager at Anheuser-Busch where I helped launch "Bees," a B2B2B application that generated over $1 billion in gross market value in its first year during COVID. I also scaled another product from zero to over $130 million in ARR, which was a very complex B2B2C marketplace. My experience with multi-sided marketplaces is directly relevant to AGIPO, giving us an edge over competitors who, I believe, do not fully grasp the marketplace aspect of workflow automation.
+**Answer:** (Script)
+
+"Hi, I'm Jacobzen, and I'm building AGIPO.
+
+My core belief is that 90% of knowledge work is just data transformation. We train *people* to do this work through conversation and teaching, but we force our *software* into rigid, pre-built blocks. This is fundamentally broken.
+
+AGIPO fixes this. It's a platform to hire and manage an AI workforce, but the magic is how you train them. You onboard an agent just like a new employee: by talking to them. You explain your unique workflow, and AGIPO translates your process into a powerful, automated tool.
+
+This is more than just automation. We're building truly collaborative AI partners and creating the future of how people and software work together."
 
 ## Company
 

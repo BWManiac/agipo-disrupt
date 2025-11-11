@@ -33,7 +33,7 @@ export function KanbanBoard() {
   );
 }
 
-function Column({ id, title, count, tasks }: (typeof kanbanColumns)[number]) {
+function Column({ title, count, tasks }: (typeof kanbanColumns)[number]) {
   return (
     <div className="flex flex-col gap-4 rounded-xl border border-border/60 bg-slate-50/70 p-4 shadow-sm">
       <header className="flex items-center justify-between border-b border-border/60 pb-3">

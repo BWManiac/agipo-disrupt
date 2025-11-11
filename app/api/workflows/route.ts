@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { nanoid } from "nanoid";
-import { FileSystemWorkflowRepository } from "@/app/workflows/repository/FileSystemWorkflowRepository";
+import { FileSystemWorkflowRepository } from "@/app/(pages)/workflows/repository/FileSystemWorkflowRepository";
 
 const repo = new FileSystemWorkflowRepository();
 
@@ -9,7 +9,7 @@ const repo = new FileSystemWorkflowRepository();
  * GET /api/workflows
  * Retrieves a list of all saved workflow summaries.
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const workflows = await repo.getWorkflows();
     return NextResponse.json(workflows);

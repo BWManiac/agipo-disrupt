@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agipo Profile Page – High Fidelity Mock</title>
+    <link
+      rel="stylesheet"
+      href="https://rsms.me/inter/inter.css"
+    />
+    <style>
+      :root {
+        --bg: #f7f7f9;
+        --surface: #ffffff;
+        --surface-subtle: #f1f1f4;
+        --border: rgba(15, 23, 42, 0.08);
+        --border-strong: rgba(15, 23, 42, 0.16);
+        --text: #0f172a;
+        --text-muted: rgba(15, 23, 42, 0.6);
+        --accent: #0f172a;
+        --accent-muted: rgba(15, 23, 42, 0.08);
+        --success: #0f766e;
+        --warning: #b45309;
+        --danger: #b91c1c;
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .page {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 48px 40px 64px;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+      }
+      h1, h2, h3, h4 {
+        margin: 0;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      h1 {
+        font-size: 28px;
+      }
+      h2 {
+        font-size: 18px;
+      }
+      h3 {
+        font-size: 16px;
+      }
+      p {
+        margin: 0;
+      }
+      .surface {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 24px;
+      }
+      .surface-subtle {
+        background: var(--surface-subtle);
+        border-radius: 12px;
+      }
+      .grid {
+        display: grid;
+        gap: 16px;
+      }
+      .grid.two {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+      .grid.three {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+      }
+      .header-metrics {
+        display: flex;
+        gap: 16px;
+      }
+      .metric-card {
+        min-width: 160px;
+        padding: 16px 18px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+      }
+      .metric-label {
+        font-size: 12px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 6px;
+      }
+      .metric-value {
+        font-size: 20px;
+        font-weight: 600;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 500;
+        line-height: 1;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: #fff;
+      }
+      .badge-success {
+        color: var(--success);
+        border-color: rgba(15, 118, 110, 0.2);
+        background: rgba(15, 118, 110, 0.08);
+      }
+      .badge-warning {
+        color: var(--warning);
+        border-color: rgba(180, 83, 9, 0.2);
+        background: rgba(180, 83, 9, 0.08);
+      }
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .section-description {
+        color: var(--text-muted);
+        font-size: 13px;
+      }
+      .list-table {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+      .list-row {
+        display: grid;
+        grid-template-columns: 220px 1fr 140px 160px;
+        gap: 16px;
+        align-items: center;
+        padding: 16px 20px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+      }
+      .list-row.header {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        background: var(--surface-subtle);
+      }
+      .list-row:last-of-type {
+        border-bottom: none;
+      }
+      .stack {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .muted {
+        color: var(--text-muted);
+        font-size: 12px;
+      }
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid var(--border-strong);
+        background: var(--surface);
+        color: inherit;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+      }
+      .button-primary {
+        background: var(--accent);
+        color: #ffffff;
+        border-color: var(--accent);
+      }
+      .chip-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .chip {
+        padding: 8px 12px;
+        border-radius: 28px;
+        background: var(--accent-muted);
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+      .recommendation-card {
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .recommendation-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+      .divider {
+        height: 1px;
+        background: var(--border);
+      }
+      .permissions-table {
+        display: grid;
+        grid-template-columns: 220px repeat(3, 120px) 80px;
+        gap: 0;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .permissions-row {
+        display: contents;
+      }
+      .permissions-cell {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+        background: var(--surface);
+        font-size: 13px;
+      }
+      .permissions-cell.header {
+        background: var(--surface-subtle);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+      .permissions-cell:last-child {
+        border-right: none;
+      }
+      .permissions-row:last-child .permissions-cell {
+        border-bottom: none;
+      }
+      .toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+      .toggle-dot {
+        width: 32px;
+        height: 16px;
+        border-radius: 999px;
+        background: var(--accent-muted);
+        position: relative;
+      }
+      .toggle-dot::after {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+      .timeline {
+        display: grid;
+        gap: 16px;
+      }
+      .timeline-item {
+        display: grid;
+        grid-template-columns: 120px 1fr;
+        gap: 16px;
+        padding: 16px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+      }
+      @media (max-width: 1080px) {
+        .header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .header-metrics {
+          flex-wrap: wrap;
+        }
+        .list-row {
+          grid-template-columns: 1fr;
+          align-items: flex-start;
+        }
+        .permissions-table {
+          display: flex;
+          flex-direction: column;
+        }
+        .permissions-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+        }
+        .timeline-item {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="surface">
+        <div class="header">
+          <div class="stack">
+            <div class="badge">Profile &middot; Org Level</div>
+            <h1>Northwind Automation Profile</h1>
+            <p class="section-description">
+              Give your agents a trusted understanding of your business context. Last updated 2h ago by Priya Desai.
+            </p>
+            <div class="chip-group">
+              <span class="chip">Industry: B2B SaaS</span>
+              <span class="chip">Teams: RevOps, Support</span>
+              <span class="chip">Primary KPI: Net Retention</span>
+            </div>
+          </div>
+          <div class="header-metrics">
+            <div class="metric-card">
+              <div class="metric-label">Completeness</div>
+              <div class="metric-value">78%</div>
+              <p class="muted">Connect billing system to reach 90%</p>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Healthy Connections</div>
+              <div class="metric-value">11 / 13</div>
+              <span class="badge-warning">2 require attention</span>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Context-enabled workflows</div>
+              <div class="metric-value">8</div>
+              <span class="muted">+3 recommended</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; gap:12px; margin-top:24px;">
+          <a class="button-primary button" href="#">Add connection</a>
+          <a class="button" href="#">Edit profile</a>
+          <a class="button" href="#">Share with teammates</a>
+        </div>
+      </section>
+
+      <section class="surface">
+        <div class="section-header">
+          <div>
+            <h2>Identity &amp; Goals</h2>
+            <p class="section-description">Set the intent for how agents should prioritize work.</p>
+          </div>
+          <a class="button" href="#">Update goals</a>
+        </div>
+        <div class="grid two">
+          <div class="surface-subtle" style="padding:20px;">
+            <h3>Operating Objectives</h3>
+            <div class="chip-group" style="margin-top:12px;">
+              <span class="chip">Increase pipeline quality</span>
+              <span class="chip">Reduce ticket backlog</span>
+              <span class="chip">Weekly business reviews</span>
+            </div>
+            <p class="muted" style="margin-top:16px;">
+              Agents use objectives to score recommendation relevance and urgency.
+            </p>
+          </div>
+          <div class="surface-subtle" style="padding:20px;">
+            <h3>Guardrails</h3>
+            <div class="stack" style="margin-top:12px;">
+              <span class="chip">PII masking: Enabled</span>
+              <span class="chip">Compliance region: US-only</span>
+              <span class="chip">Escalate spend &gt; $5k</span>
+            </div>
+            <p class="muted" style="margin-top:16px;">Applies across all marketplace agents unless overridden.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="surface">
+        <div class="section-header">
+          <div>
+            <h2>Connections</h2>
+            <p class="section-description">All authorized systems that feed context into Agipo.</p>
+          </div>
+          <a class="button" href="#">View connection library</a>
+        </div>
+        <div class="list-table">
+          <div class="list-row header">
+            <div>Integration</div>
+            <div>Context Domains</div>
+            <div>Status</div>
+            <div>Last Sync</div>
+          </div>
+          <div class="list-row">
+            <div class="stack">
+              <strong>HubSpot</strong>
+              <span class="muted">CRM · OAuth</span>
+            </div>
+            <div class="chip-group">
+              <span class="chip">Accounts</span>
+              <span class="chip">Deals</span>
+              <span class="chip">Pipeline Health</span>
+            </div>
+            <div><span class="badge-success">Active</span></div>
+            <div class="stack">
+              <span>5 minutes ago</span>
+              <span class="muted">Webhook streaming</span>
+            </div>
+          </div>
+          <div class="list-row">
+            <div class="stack">
+              <strong>Zendesk</strong>
+              <span class="muted">Support · OAuth</span>
+            </div>
+            <div class="chip-group">
+              <span class="chip">Tickets</span>
+              <span class="chip">SLAs</span>
+              <span class="chip">Sentiment</span>
+            </div>
+            <div><span class="badge-success">Active</span></div>
+            <div class="stack">
+              <span>12 minutes ago</span>
+              <span class="muted">Streaming</span>
+            </div>
+          </div>
+          <div class="list-row">
+            <div class="stack">
+              <strong>NetSuite</strong>
+              <span class="muted">Finance · API key</span>
+            </div>
+            <div class="chip-group">
+              <span class="chip">Revenue</span>
+              <span class="chip">Invoices</span>
+            </div>
+            <div><span class="badge-warning">Token expiring</span></div>
+            <div class="stack">
+              <span>3 hours ago</span>
+              <a class="button" href="#">Refresh token</a>
+            </div>
+          </div>
+          <div class="list-row">
+            <div class="stack">
+              <strong>Manual upload: OKRs.q1.csv</strong>
+              <span class="muted">Document · Uploaded by Priya</span>
+            </div>
+            <div class="chip-group">
+              <span class="chip">Objectives</span>
+              <span class="chip">Owners</span>
+            </div>
+            <div><span class="badge-success">Indexed</span></div>
+            <div class="stack">
+              <span>Yesterday</span>
+              <span class="muted">Valid through Apr 30</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="surface">
+        <div class="section-header">
+          <div>
+            <h2>Knowledge Assets &amp; Schemas</h2>
+            <p class="section-description">Contracts, datasets, and APIs agents can query.</p>
+          </div>
+          <a class="button" href="#">Import schema</a>
+        </div>
+        <div class="grid two">
+          <div class="surface-subtle" style="padding:20px;">
+            <h3>Data Dictionary</h3>
+            <div class="stack" style="margin-top:12px;">
+              <div class="stack">
+                <strong>deal_stage</strong>
+                <span class="muted">Enum · Source: HubSpot</span>
+              </div>
+              <div class="stack">
+                <strong>ticket_satisfaction_score</strong>
+                <span class="muted">Float · Source: Zendesk</span>
+              </div>
+              <div class="stack">
+                <strong>net_retention_percent</strong>
+                <span class="muted">Calculated · Blend: NetSuite + HubSpot</span>
+              </div>
+            </div>
+          </div>
+          <div class="surface-subtle" style="padding:20px;">
+            <h3>Event Streams</h3>
+            <div class="stack" style="margin-top:12px;">
+              <div class="stack">
+                <strong>Weekly pipeline snapshot</strong>
+                <span class="muted">Cron · Mondays 6am PT</span>
+              </div>
+              <div class="stack">
+                <strong>Customer churn alerts</strong>
+                <span class="muted">Webhook · Slack #revops-alerts</span>
+              </div>
+              <div class="stack">
+                <strong>Agent activity log</strong>
+                <span class="muted">Every run · Stored 30 days</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="surface">
+        <div class="section-header">
+          <div>
+            <h2>Recommendations</h2>
+            <p class="section-description">Drafted by the AI orchestration engine based on your context.</p>
+          </div>
+          <a class="button" href="#">View history</a>
+        </div>
+        <div class="grid two">
+          <article class="recommendation-card">
+            <div class="recommendation-meta">
+              <span class="badge">Workflow draft</span>
+              <span>Confidence: 92%</span>
+              <span>New</span>
+            </div>
+            <h3>Customer Health Review – Weekly</h3>
+            <p class="section-description">
+              Combine HubSpot pipeline data with Zendesk escalations to generate a CSM-ready briefing every Monday.
+            </p>
+            <div class="chip-group">
+              <span class="chip">Uses HubSpot</span>
+              <span class="chip">Uses Zendesk</span>
+              <span class="chip">Outputs Notion doc</span>
+            </div>
+            <div class="divider"></div>
+            <div style="display:flex; gap:12px;">
+              <a class="button-primary button" href="#">Open draft</a>
+              <a class="button" href="#">Adjust inputs</a>
+              <a class="button" href="#">Dismiss</a>
+            </div>
+          </article>
+          <article class="recommendation-card">
+            <div class="recommendation-meta">
+              <span class="badge">Marketplace agent</span>
+              <span>Match score: 88%</span>
+            </div>
+            <h3>Forecast Co-Pilot</h3>
+            <p class="section-description">
+              Agent from RevOps Labs that calibrates forecasts using NetSuite revenue actuals and pipeline velocity trends.
+            </p>
+            <div class="chip-group">
+              <span class="chip">Requires NetSuite</span>
+              <span class="chip">Requires HubSpot</span>
+              <span class="chip">Compliance-ready</span>
+            </div>
+            <div class="divider"></div>
+            <div style="display:flex; gap:12px;">
+              <a class="button" href="#">Preview agent</a>
+              <a class="button" href="#">Grant access</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="surface">
+        <div class="section-header">
+          <div>
+            <h2>Agent Access Control</h2>
+            <p class="section-description">Manage which agents can leverage each context domain.</p>
+          </div>
+          <a class="button" href="#">Bulk actions</a>
+        </div>
+        <div class="permissions-table">
+          <div class="permissions-row">
+            <div class="permissions-cell header">Agent</div>
+            <div class="permissions-cell header">Revenue Data</div>
+            <div class="permissions-cell header">Support Data</div>
+            <div class="permissions-cell header">Docs &amp; OKRs</div>
+            <div class="permissions-cell header">Logs</div>
+          </div>
+          <div class="permissions-row">
+            <div class="permissions-cell">
+              <strong>Pipeline Autopilot</strong>
+              <div class="muted">Owned agent · Internal</div>
+            </div>
+            <div class="permissions-cell"><span class="toggle"><span class="toggle-dot"></span> Full</span></div>
+            <div class="permissions-cell"><span class="toggle"><span class="toggle-dot"></span> Limited</span></div>
+            <div class="permissions-cell"><span class="toggle"><span class="toggle-dot"></span> Off</span></div>
+            <div class="permissions-cell"><span class="toggle"><span class="toggle-dot"></span> On</span></div>
+          </div>
+          <div class="permissions-row">
+            <div class="permissions-cell">
+              <strong>Support Triage Assistant</strong>
+              <div class="muted">Marketplace · RevOps Labs</div>
+            </div>
+            <div class="permissions-cell"><span class="toggle"><span class="toggle-dot"></span> Off</span></div>
+            <div class="permissions-cell"><span class="toggle"><span class="toggle-dot"></span> Full</span></div>
+            <div class="permissions-cell"><span class="toggle"><span class="toggle-dot"></span> Limited</span></div>
+            <div class="permissions-cell"><span class="toggle"><span class="toggle-dot"></span> On</span></div>
+          </div>
+          <div class="permissions-row">
+            <div class="permissions-cell">
+              <strong>Quarterly Business Review Generator</strong>
+              <div class="muted">Marketplace · Compass AI</div>
+            </div>
+            <div class="permissions-cell"><span class="toggle"><span class="toggle-dot"></span> Limited</span></div>
+            <div class="permissions-cell"><span class="toggle"><span class="toggle-dot"></span> Limited</span></div>
+            <div class="permissions-cell"><span class="toggle"><span class="toggle-dot"></span> Full</span></div>
+            <div class="permissions-cell"><span class="toggle"><span class="toggle-dot"></span> On</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="surface">
+        <div class="section-header">
+          <div>
+            <h2>Activity &amp; Audit</h2>
+            <p class="section-description">Everything agents and admins changed in this profile.</p>
+          </div>
+          <a class="button" href="#">Export log</a>
+        </div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="muted">Today · 09:24</div>
+            <div class="stack">
+              <strong>Token refreshed for NetSuite</strong>
+              <span class="muted">Priya Desai · Received email confirmation</span>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="muted">Yesterday · 16:12</div>
+            <div class="stack">
+              <strong>Accepted workflow recommendation “Customer Health Review”</strong>
+              <span class="muted">Workflow saved to drafts and scheduled weekly</span>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="muted">Mon · 11:08</div>
+            <div class="stack">
+              <strong>Granted Forecast Co-Pilot access to Revenue data</strong>
+              <span class="muted">Auto-notified agent creator · Scope: read-only</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="surface">
+        <div class="section-header">
+          <div>
+            <h2>Connector Roadmap</h2>
+            <p class="section-description">Prioritized by profile demand.</p>
+          </div>
+          <a class="button" href="#">Submit request</a>
+        </div>
+        <div class="grid three">
+          <div class="surface-subtle" style="padding:20px;">
+            <div class="badge">In Beta</div>
+            <h3 style="margin-top:12px;">Salesforce Marketing Cloud</h3>
+            <p class="muted" style="margin-top:8px;">Join waitlist · unlocks lifecycle nurture workflows.</p>
+          </div>
+          <div class="surface-subtle" style="padding:20px;">
+            <div class="badge">Planned</div>
+            <h3 style="margin-top:12px;">Gainsight</h3>
+            <p class="muted" style="margin-top:8px;">Help us understand how you score health trends.</p>
+          </div>
+          <div class="surface-subtle" style="padding:20px;">
+            <div class="badge">Requested by you</div>
+            <h3 style="margin-top:12px;">Looker</h3>
+            <p class="muted" style="margin-top:8px;">We’ll notify you when dashboards sync is ready.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

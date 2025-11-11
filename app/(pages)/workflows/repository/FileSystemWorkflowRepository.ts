@@ -77,7 +77,7 @@ export class FileSystemWorkflowRepository {
       const data = JSON.parse(fileContent);
       // Validate the data against our schema before returning it.
       return WorkflowDataSchema.parse(data);
-    } catch (error) {
+    } catch {
       // If the file doesn't exist or is invalid, return null.
       return null;
     }

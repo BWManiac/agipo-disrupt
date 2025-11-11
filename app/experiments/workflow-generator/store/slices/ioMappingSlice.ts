@@ -90,7 +90,7 @@ export const createIoMappingSlice: StateCreator<
   [],
   [],
   IoMappingSlice
-> = (set, get) => ({
+> = (set) => ({
   ...initialState,
 
   setActiveEdge: (edgeId) => {

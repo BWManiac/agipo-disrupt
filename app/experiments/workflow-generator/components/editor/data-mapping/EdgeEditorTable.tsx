@@ -41,7 +41,6 @@ import type {
 import type { WorkflowNode } from "../../../store/types";
 
 type EdgeEditorTableProps = {
-  edgeId: string;
   sourceNode: WorkflowNode | null;
   targetNode: WorkflowNode | null;
   mapping?: EdgeMapping;
@@ -57,14 +56,6 @@ const typeLabel = (type: BusinessFieldType, itemType?: BusinessListItemType) => 
   }
   return type.charAt(0).toUpperCase() + type.slice(1);
 };
-
-const compareFieldRefs = (a?: EdgeFieldRef, b?: EdgeFieldRef) =>
-  !!a &&
-  !!b &&
-  a.nodeId === b.nodeId &&
-  a.fieldName === b.fieldName &&
-  a.type === b.type &&
-  a.itemType === b.itemType;
 
 const compatibility = (
   from?: EdgeFieldRef,
@@ -89,7 +80,6 @@ const findLinkForField = (
   );
 
 export function EdgeEditorTable({
-  edgeId,
   sourceNode,
   targetNode,
   mapping,
